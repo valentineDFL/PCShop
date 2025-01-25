@@ -16,7 +16,7 @@ namespace Domain.Interfaces.Services
 
         public Task<BaseResult<ProductDto>> GetProductByIdAsync(Guid id);
 
-        public Task<ResultCollection<ProductDto>> GetProductsByNamePartAsync(string name);
+        public Task<CollectionResult<ProductDto>> GetProductsByNamePartAsync(string name);
 
         public Task<BaseResult<ProductDto>> GetProductsByCategoryIdAsync(Guid id);
 

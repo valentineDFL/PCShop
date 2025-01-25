@@ -10,7 +10,7 @@ namespace Domain.Interfaces.Repositories
 {
     public interface IRepository<TModel>
     {
-        public Task<ResultCollection<List<TModel>>> GetAllAsync();
+        public Task<CollectionResult<TModel>> GetAllAsync();
 
         public Task<BaseResult<TModel>> CreateAsync(TModel model);
 

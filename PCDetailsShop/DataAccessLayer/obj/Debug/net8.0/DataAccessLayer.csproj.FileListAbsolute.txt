@@ -32,3 +32,4 @@ E:\GithubRepositories\PCShop\PCDetailsShop\DataAccessLayer\obj\Debug\net8.0\refi
 E:\GithubRepositories\PCShop\PCDetailsShop\DataAccessLayer\obj\Debug\net8.0\DataAccessLayer.pdb
 E:\GithubRepositories\PCShop\PCDetailsShop\DataAccessLayer\obj\Debug\net8.0\DataAccessLayer.genruntimeconfig.cache
 E:\GithubRepositories\PCShop\PCDetailsShop\DataAccessLayer\obj\Debug\net8.0\ref\DataAccessLayer.dll
+E:\GithubRepositories\PCShop\PCDetailsShop\DataAccessLayer\obj\Debug\net8.0\DataAccessLayer.sourcelink.json

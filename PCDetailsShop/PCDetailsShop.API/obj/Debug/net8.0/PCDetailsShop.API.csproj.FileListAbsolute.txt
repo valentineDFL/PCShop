@@ -308,3 +308,4 @@ E:\GithubRepositories\PCShop\PCDetailsShop\PCDetailsShop.API\obj\Debug\net8.0\re
 E:\GithubRepositories\PCShop\PCDetailsShop\PCDetailsShop.API\obj\Debug\net8.0\PCDetailsShop.API.pdb
 E:\GithubRepositories\PCShop\PCDetailsShop\PCDetailsShop.API\obj\Debug\net8.0\PCDetailsShop.API.genruntimeconfig.cache
 E:\GithubRepositories\PCShop\PCDetailsShop\PCDetailsShop.API\obj\Debug\net8.0\ref\PCDetailsShop.API.dll
+E:\GithubRepositories\PCShop\PCDetailsShop\PCDetailsShop.API\obj\Debug\net8.0\PCDetailsShop.API.sourcelink.json

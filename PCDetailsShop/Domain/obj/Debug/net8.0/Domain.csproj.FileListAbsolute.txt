@@ -20,3 +20,4 @@ E:\GithubRepositories\PCShop\PCDetailsShop\Domain\obj\Debug\net8.0\Domain.dll
 E:\GithubRepositories\PCShop\PCDetailsShop\Domain\obj\Debug\net8.0\refint\Domain.dll
 E:\GithubRepositories\PCShop\PCDetailsShop\Domain\obj\Debug\net8.0\Domain.pdb
 E:\GithubRepositories\PCShop\PCDetailsShop\Domain\obj\Debug\net8.0\ref\Domain.dll
+E:\GithubRepositories\PCShop\PCDetailsShop\Domain\obj\Debug\net8.0\Domain.sourcelink.json

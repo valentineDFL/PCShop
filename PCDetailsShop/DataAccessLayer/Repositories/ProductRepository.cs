@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DataAccessLayer.Entities;
 using DataAccessLayer.Mapping;
+using Domain.Enums;
 using Domain.Interfaces.Repositories;
 using Domain.Models;
+using Domain.Result;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 
 namespace DataAccessLayer.Repositories
 {
-    internal class ProductRepository // : IRepository<Product>
+    internal class ProductRepository : IRepository<Product>
     {
         private readonly PcShopDbContext _dbContext;
         private readonly ProductMapper _productMapper;
@@ -23,15 +26,30 @@ namespace DataAccessLayer.Repositories
             _productMapper = productMapper;
         }
 
-        public async Task<List<Product>> GetAllAsync()
+        public async Task<CollectionResult<Product>> GetAllAsync()
         {
             List<ProductEntity> entities = await _dbContext.Products.ToListAsync();
+
+            if(entities.Count == 0)
+            {
+                return new CollectionResult<Product>()
+                {
+                    Count = 0,
+                    ErrorCode = (int)ErrorCodes.ProductsNotFound,
+                    ErrorMessage = ErrorCodes.ProductsNotFound.ToString()
+                };
+            }
+
             List<Product> products = await _productMapper.EntitiesToModelsAsync(entities);
 
-            return products;
+            return new CollectionResult<Product>() 
+            {
+                Count = products.Count,
+                Data = products
+            };
         }
 
-        public async Task<Product> CreateAsync(Product product)
+        public async Task<BaseResult<Product>> CreateAsync(Product product)
         {
             if (product == null)
                 throw new ArgumentNullException($"Product null {nameof(CreateAsync)}");
@@ -41,30 +59,40 @@ namespace DataAccessLayer.Repositories
             await _dbContext.Products.AddAsync(entity);
             await _dbContext.SaveChangesAsync();
 
-            return product;
+            return new BaseResult<Product>() { Data = product };
         }
 
-        public async Task<Product> DeleteAsync(Product product)
+        public async Task<BaseResult<Guid>> DeleteAsync(Guid id)
         {
-            if (product == null)
-                throw new ArgumentNullException($"Product null {nameof(DeleteAsync)}");
+            if (id == Guid.Empty)
+                throw new ArgumentException($"Product id is Empty {nameof(DeleteAsync)}");
 
-            ProductEntity entity = await _productMapper.ModelToEntityAsync(product);
+            int countDeletedProducts = await _dbContext.Products
+                .Where(p => p.Id == id)
+                .ExecuteDeleteAsync();
 
-            _dbContext.Remove(entity);
+            if(countDeletedProducts == 0)
+            {
+                return new BaseResult<Guid>()
+                {
+                    ErrorCode = (int)ErrorCodes.ProductNotFound,
+                    ErrorMessage = ErrorCodes.ProductNotFound.ToString()
+                };
+            }
+
             await _dbContext.SaveChangesAsync();
 
-            return product;
+            return new BaseResult<Guid>() { Data = id };
         }
 
-        public async Task<Product> UpdateAsync(Product product)
+        public async Task<BaseResult<Product>> UpdateAsync(Product product)
         {
             if (product == null)
                 throw new ArgumentNullException($"Product null {nameof(UpdateAsync)}");
 
             ProductEntity entity = await _productMapper.ModelToEntityAsync(product);
 
-            await _dbContext.Products
+            int updatedProductsCount = await _dbContext.Products
                 .Where(p => p.Id == entity.Id)
                 .ExecuteUpdateAsync(p => p
                 .SetProperty(p => p.Name, entity.Name)
@@ -73,9 +101,21 @@ namespace DataAccessLayer.Repositories
                 .SetProperty(p => p.Weight, entity.Weight)
                 .SetProperty(p => p.Categories, entity.Categories));
 
+            if(updatedProductsCount == 0)
+            {
+                return new BaseResult<Product>()
+                {
+                    ErrorCode = (int)ErrorCodes.ProductNotFound,
+                    ErrorMessage = ErrorCodes.ProductNotFound.ToString()
+                };
+            }
+
             await _dbContext.SaveChangesAsync();
 
-            return product;
+            return new BaseResult<Product>()
+            {
+                Data = product
+            };
         }
     }
 }

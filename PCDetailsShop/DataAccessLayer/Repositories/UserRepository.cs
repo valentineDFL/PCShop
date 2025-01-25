@@ -26,14 +26,13 @@ namespace DataAccessLayer.Repositories
             _userMapper = userMapper;
         }
 
-        public async Task<ResultCollection<List<User>>> GetAllAsync()
+        public async Task<CollectionResult<User>> GetAllAsync()
         {
             List<UserEntity> entities = await _dbContext.Users.ToListAsync();
-            List<User> users = await _userMapper.EntitiesToModelsAsync(entities);
 
-            if(users.Count == 0)
+            if(entities.Count == 0)
             {
-                return new ResultCollection<List<User>>()
+                return new CollectionResult<User>()
                 {
                     Count = 0,
                     ErrorCode = (int)ErrorCodes.UsersNotFound,
@@ -41,12 +40,12 @@ namespace DataAccessLayer.Repositories
                 };
             }
 
-            BaseResult<List<User>> baseResult = new BaseResult<List<User>>() { Data = users };
+            List<User> users = await _userMapper.EntitiesToModelsAsync(entities);
 
-            return new ResultCollection<List<User>>()
+            return new CollectionResult<User>()
             {
                 Count = users.Count,
-                Data = (IEnumerable<List<User>>)baseResult,
+                Data = users,
             };
         }
 
@@ -60,24 +59,20 @@ namespace DataAccessLayer.Repositories
             await _dbContext.Users.AddAsync(entity);
             await _dbContext.SaveChangesAsync();
 
-            return new BaseResult<User>()
-            {
-                Data = user,
-            };
+            return new BaseResult<User>() { Data = user };
         }
 
         public async Task<BaseResult<Guid>> DeleteAsync(Guid id)
         {
             if(id == Guid.Empty) 
-                throw new ArgumentException("User id is Empty");
+                throw new ArgumentException($"User id is Empty {nameof(DeleteAsync)}");
 
-            int countUsersToRemove = await _dbContext.Users
+            int countRemovedUsers = await _dbContext.Users
                 .Where(u => u.Id == id)
                 .ExecuteDeleteAsync();
 
-            await _dbContext.SaveChangesAsync();
 
-            if(countUsersToRemove == 0)
+            if(countRemovedUsers == 0)
             {
                 return new BaseResult<Guid>()
                 {
@@ -86,10 +81,9 @@ namespace DataAccessLayer.Repositories
                 };
             }
 
-            return new BaseResult<Guid>()
-            {
-                Data = id,
-            };
+            await _dbContext.SaveChangesAsync();
+
+            return new BaseResult<Guid>() { Data = id };
         }
 
         public async Task<BaseResult<User>> UpdateAsync(User user)
@@ -99,7 +93,7 @@ namespace DataAccessLayer.Repositories
 
             UserEntity entity = _userMapper.ModelToEntity(user);
 
-            int updatedPropertyCount = await _dbContext.Users
+            int updatedUsersCount = await _dbContext.Users
                 .Where(p => p.Id == entity.Id)
                 .ExecuteUpdateAsync(u => u
                 .SetProperty(p => p.Login, entity.Login)
@@ -108,20 +102,18 @@ namespace DataAccessLayer.Repositories
                 .SetProperty(p => p.WalletBalance, entity.WalletBalance)
                 .SetProperty(p => p.BirthDate, entity.BirthDate));
 
-            await _dbContext.SaveChangesAsync();
-
-            if(updatedPropertyCount == 0)
+            if(updatedUsersCount == 0)
             {
                 return new BaseResult<User>()
                 {
-                    
+                    ErrorCode = (int)ErrorCodes.UserNotFound,
+                    ErrorMessage = ErrorCodes.UserNotFound.ToString(),
                 };
             }
 
-            return new BaseResult<User>()
-            { 
-                Data = user
-            };
+            await _dbContext.SaveChangesAsync();
+
+            return new BaseResult<User>() { Data = user };
         }
     }
 }

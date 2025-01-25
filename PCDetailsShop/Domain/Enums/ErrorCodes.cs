@@ -20,12 +20,19 @@ namespace Domain.Enums
 
         NewUserPasswordCannotBeRepeatedWithTheOldOne = 17,
 
-        ProductNotFound = 21,
-        ProductsNotFound = 22,
-        ProductAlreadyExists = 23,
+
+        CartNotFound = 21,
+        CartsNotFound = 22,
 
 
-        CategoryNotFound = 31,
+
+        ProductNotFound = 31,
+        ProductsNotFound = 32,
+        ProductAlreadyExists = 33,
+
+
+        CategoryNotFound = 41,
+        CategoriesNotFound = 42,
         
     }
 }

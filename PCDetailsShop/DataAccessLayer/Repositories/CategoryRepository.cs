@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using DataAccessLayer.Entities;
 using DataAccessLayer.Mapping;
+using Domain.Enums;
 using Domain.Interfaces.Repositories;
 using Domain.Models;
+using Domain.Result;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccessLayer.Repositories
 {
-    internal class CategoryRepository // : IRepository<Category>
+    internal class CategoryRepository : IRepository<Category>
     {
         private readonly PcShopDbContext _dbContext;
         private readonly CategoryMapper _categoryMapper;
@@ -23,15 +26,29 @@ namespace DataAccessLayer.Repositories
             _categoryMapper = categoryMapper;
         }
 
-        public async Task<List<Category>> GetAllAsync()
+        public async Task<CollectionResult<Category>> GetAllAsync()
         {
             List<CategoryEntity> categoties = await _dbContext.Categories.ToListAsync();
+
+            if(categoties.Count == 0)
+            {
+                return new CollectionResult<Category>()
+                {
+                    ErrorCode = (int)ErrorCodes.CategoriesNotFound,
+                    ErrorMessage = ErrorCodes.CategoriesNotFound.ToString()
+                };
+            }
+
             List<Category> result = await _categoryMapper.EntitiesToModelsAsync(categoties);
             
-            return result;
+            return new CollectionResult<Category>()
+            {
+                Count = result.Count,
+                Data = result
+            };
         }
 
-        public async Task<Category> CreateAsync(Category category)
+        public async Task<BaseResult<Category>> CreateAsync(Category category)
         {
             if (category == null)
                 throw new ArgumentNullException($"Categoty null {nameof(CreateAsync)}");
@@ -41,11 +58,14 @@ namespace DataAccessLayer.Repositories
             await _dbContext.AddAsync(entity);
             await _dbContext.SaveChangesAsync();
 
-            return category;
+            return new BaseResult<Category>() { Data = category };
         }
 
-        public async Task<Guid> DeleteAsync(Guid id)
+        public async Task<BaseResult<Guid>> DeleteAsync(Guid id)
         {
+            if (id == Guid.Empty)
+                throw new ArgumentException($"Category id is Empty {nameof(DeleteAsync)}");
+
             int deletedCategories = await _dbContext.Categories
                 .Where(cat => cat.Id == id)
                 .ExecuteDeleteAsync();
@@ -53,27 +73,42 @@ namespace DataAccessLayer.Repositories
             await _dbContext.SaveChangesAsync();
 
             if (deletedCategories == 0)
-                throw new ArgumentException("Categoty not found");
+            {
+                return new BaseResult<Guid>()
+                {
+                    ErrorCode = (int)ErrorCodes.CategoryNotFound,
+                    ErrorMessage = ErrorCodes.CategoryNotFound.ToString()
+                };
+            }
 
-            return id;
+            return new BaseResult<Guid>() { Data = id };
         }
 
-        public async Task<Category> UpdateAsync(Category category)
+        public async Task<BaseResult<Category>> UpdateAsync(Category category)
         {
             if (category == null)
                 throw new ArgumentNullException($"Categoty null {nameof(UpdateAsync)}");
 
             CategoryEntity entity = _categoryMapper.ModelToEntity(category);
 
-            await _dbContext.Categories
+            int updatedCategoriesCount = await _dbContext.Categories
                 .Where(c => c.Id == entity.Id)
                 .ExecuteUpdateAsync(c => c
                 .SetProperty(p => p.Name, entity.Name)
                 .SetProperty(p => p.Products, entity.Products));
 
+            if(updatedCategoriesCount == 0)
+            {
+                return new BaseResult<Category>()
+                {
+                    ErrorCode = (int)ErrorCodes.CategoryNotFound,
+                    ErrorMessage = ErrorCodes.CategoryNotFound.ToString()
+                };
+            }
+
             await _dbContext.AddAsync(entity);
 
-            return category;
+            return new BaseResult<Category>() { Data = category };
         }
     }
 }

@@ -10,11 +10,11 @@ namespace Domain.Interfaces.Services
 {
     internal interface ICartService
     {
-        public Task<ResultCollection<Product>> GetAllProductsInCartAsync();
+        public Task<CollectionResult<Product>> GetAllProductsInCartAsync();
 
         public Task<BaseResult<Product>> RemoveProductFromCartByIdAsync(Guid productId);
 
-        public Task<ResultCollection<Product>> BuyProductsAsync();
+        public Task<CollectionResult<Product>> BuyProductsAsync();
 
         public Task<BaseResult<decimal>> GetProductsSummCost();
 

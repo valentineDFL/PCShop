@@ -18,17 +18,17 @@ namespace Application.Services
     public class UserService : IUserService
     {
         private readonly IRepository<User> _userRepository;
-        //private readonly IRepository<Cart> _cartRepository;
+        private readonly IRepository<Cart> _cartRepository;
 
         private readonly ILogger _logger;
         private readonly IUserValidator _userValidator;
 
         private readonly IEncrypter _passwordEncrypter;
 
-        public UserService(IRepository<User> userRepository, ILogger logger, IUserValidator userValidator, IEncrypter passwordEncrypter)
+        public UserService(IRepository<User> userRepository, IRepository<Cart> cartRepository, ILogger logger, IUserValidator userValidator, IEncrypter passwordEncrypter)
         {
             _userRepository = userRepository;
-            //_cartRepository = cartRepository;
+            _cartRepository = cartRepository;
             _logger = logger;
             _userValidator = userValidator;
             _passwordEncrypter = passwordEncrypter;
@@ -38,13 +38,10 @@ namespace Application.Services
         {
             try
             {
-                ResultCollection<List<User>> users = await _userRepository.GetAllAsync();
+                CollectionResult<User> users = await _userRepository.GetAllAsync();
 
-                List<User> userssssss = (List<User>)users.Data;
-
-                User user = userssssss.Where(u => u.Id == id)
+                User user = users.Data.Where(u => u.Id == id)
                     .FirstOrDefault();
-                    
 
                 BaseResult validationResult = _userValidator.ValidateOnNull(user);
 
