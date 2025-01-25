@@ -1,0 +1,34 @@
+E:\Projects\Visual Studio Project\PCDetailsShop\DataAccessLayer\bin\Debug\net8.0\DataAccessLayer.deps.json
+E:\Projects\Visual Studio Project\PCDetailsShop\DataAccessLayer\bin\Debug\net8.0\DataAccessLayer.runtimeconfig.json
+E:\Projects\Visual Studio Project\PCDetailsShop\DataAccessLayer\bin\Debug\net8.0\DataAccessLayer.dll
+E:\Projects\Visual Studio Project\PCDetailsShop\DataAccessLayer\bin\Debug\net8.0\DataAccessLayer.pdb
+E:\Projects\Visual Studio Project\PCDetailsShop\DataAccessLayer\obj\Debug\net8.0\DataAccessLayer.csproj.AssemblyReference.cache
+E:\Projects\Visual Studio Project\PCDetailsShop\DataAccessLayer\obj\Debug\net8.0\DataAccessLayer.GeneratedMSBuildEditorConfig.editorconfig
+E:\Projects\Visual Studio Project\PCDetailsShop\DataAccessLayer\obj\Debug\net8.0\DataAccessLayer.AssemblyInfoInputs.cache
+E:\Projects\Visual Studio Project\PCDetailsShop\DataAccessLayer\obj\Debug\net8.0\DataAccessLayer.AssemblyInfo.cs
+E:\Projects\Visual Studio Project\PCDetailsShop\DataAccessLayer\obj\Debug\net8.0\DataAccessLayer.csproj.CoreCompileInputs.cache
+E:\Projects\Visual Studio Project\PCDetailsShop\DataAccessLayer\obj\Debug\net8.0\DataAccessLayer.dll
+E:\Projects\Visual Studio Project\PCDetailsShop\DataAccessLayer\obj\Debug\net8.0\refint\DataAccessLayer.dll
+E:\Projects\Visual Studio Project\PCDetailsShop\DataAccessLayer\obj\Debug\net8.0\DataAccessLayer.pdb
+E:\Projects\Visual Studio Project\PCDetailsShop\DataAccessLayer\obj\Debug\net8.0\DataAccessLayer.genruntimeconfig.cache
+E:\Projects\Visual Studio Project\PCDetailsShop\DataAccessLayer\obj\Debug\net8.0\ref\DataAccessLayer.dll
+E:\Projects\Visual Studio Project\PCDetailsShop\DataAccessLayer\bin\Debug\net8.0\Domain.dll
+E:\Projects\Visual Studio Project\PCDetailsShop\DataAccessLayer\bin\Debug\net8.0\Domain.pdb
+E:\Projects\Visual Studio Project\PCDetailsShop\DataAccessLayer\obj\Debug\net8.0\DataAcce.E67BD773.Up2Date
+E:\GithubRepositories\PCShop\PCDetailsShop\DataAccessLayer\bin\Debug\net8.0\DataAccessLayer.deps.json
+E:\GithubRepositories\PCShop\PCDetailsShop\DataAccessLayer\bin\Debug\net8.0\DataAccessLayer.runtimeconfig.json
+E:\GithubRepositories\PCShop\PCDetailsShop\DataAccessLayer\bin\Debug\net8.0\DataAccessLayer.dll
+E:\GithubRepositories\PCShop\PCDetailsShop\DataAccessLayer\bin\Debug\net8.0\DataAccessLayer.pdb
+E:\GithubRepositories\PCShop\PCDetailsShop\DataAccessLayer\bin\Debug\net8.0\Domain.dll
+E:\GithubRepositories\PCShop\PCDetailsShop\DataAccessLayer\bin\Debug\net8.0\Domain.pdb
+E:\GithubRepositories\PCShop\PCDetailsShop\DataAccessLayer\obj\Debug\net8.0\DataAccessLayer.csproj.AssemblyReference.cache
+E:\GithubRepositories\PCShop\PCDetailsShop\DataAccessLayer\obj\Debug\net8.0\DataAccessLayer.GeneratedMSBuildEditorConfig.editorconfig
+E:\GithubRepositories\PCShop\PCDetailsShop\DataAccessLayer\obj\Debug\net8.0\DataAccessLayer.AssemblyInfoInputs.cache
+E:\GithubRepositories\PCShop\PCDetailsShop\DataAccessLayer\obj\Debug\net8.0\DataAccessLayer.AssemblyInfo.cs
+E:\GithubRepositories\PCShop\PCDetailsShop\DataAccessLayer\obj\Debug\net8.0\DataAccessLayer.csproj.CoreCompileInputs.cache
+E:\GithubRepositories\PCShop\PCDetailsShop\DataAccessLayer\obj\Debug\net8.0\DataAcce.E67BD773.Up2Date
+E:\GithubRepositories\PCShop\PCDetailsShop\DataAccessLayer\obj\Debug\net8.0\DataAccessLayer.dll
+E:\GithubRepositories\PCShop\PCDetailsShop\DataAccessLayer\obj\Debug\net8.0\refint\DataAccessLayer.dll
+E:\GithubRepositories\PCShop\PCDetailsShop\DataAccessLayer\obj\Debug\net8.0\DataAccessLayer.pdb
+E:\GithubRepositories\PCShop\PCDetailsShop\DataAccessLayer\obj\Debug\net8.0\DataAccessLayer.genruntimeconfig.cache
+E:\GithubRepositories\PCShop\PCDetailsShop\DataAccessLayer\obj\Debug\net8.0\ref\DataAccessLayer.dll
