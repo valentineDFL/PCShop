@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 
 namespace DataAccessLayer.Repositories
 {
-    internal class ProductRepository : IRepository<Product>
+    internal class ProductRepository // : IRepository<Product>
     {
         private readonly PcShopDbContext _dbContext;
         private readonly ProductMapper _productMapper;

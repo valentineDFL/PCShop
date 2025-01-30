@@ -28,7 +28,10 @@ namespace DataAccessLayer.Repositories
 
         public async Task<CollectionResult<Cart>> GetAllAsync()
         {
-            List<CartEntity> entities = await _dbContext.Carts.ToListAsync();
+            List<CartEntity> entities = await _dbContext.Carts
+                .AsNoTracking()
+                .Include(x => x.User)
+                .ToListAsync();
 
             if(entities.Count == 0)
             {
@@ -47,6 +50,27 @@ namespace DataAccessLayer.Repositories
                 Count = carts.Count,
                 Data = carts,
             };
+        }
+
+        public async Task<BaseResult<Cart>> GetByIdAsync(Guid id)
+        {
+            CartEntity cart = await _dbContext.Carts
+                .Include(x => x.User)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if(cart == null)
+            {
+                return new BaseResult<Cart>()
+                {
+                    ErrorCode = (int)ErrorCodes.CartNotFound,
+                    ErrorMessage = ErrorCodes.CartNotFound.ToString()
+                };
+            }
+
+            Cart result = _cartMapper.EntityToModel(cart);
+
+            return new BaseResult<Cart>() { Data = result };
         }
 
         public async Task<BaseResult<Cart>> CreateAsync(Cart cart)

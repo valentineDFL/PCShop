@@ -7,5 +7,5 @@ using System.Threading.Tasks;
 
 namespace Domain.Dto.UserDtos
 {
-    public record class UpdateUserDto(Guid Id, string Login, string Email, string OldPassword, string NewPassword);
+    public record class UpdateUserDto(Guid Id, string Login, string Email, string OldPassword, string NewPassword, decimal summForAdd);
 }

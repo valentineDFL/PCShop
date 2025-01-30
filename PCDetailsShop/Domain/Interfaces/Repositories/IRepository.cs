@@ -12,6 +12,8 @@ namespace Domain.Interfaces.Repositories
     {
         public Task<CollectionResult<TModel>> GetAllAsync();
 
+        public Task<BaseResult<TModel>> GetByIdAsync(Guid id);
+
         public Task<BaseResult<TModel>> CreateAsync(TModel model);
 
         public Task<BaseResult<TModel>> UpdateAsync(TModel model);

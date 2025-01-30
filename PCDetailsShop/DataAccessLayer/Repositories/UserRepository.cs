@@ -30,7 +30,7 @@ namespace DataAccessLayer.Repositories
         {
             List<UserEntity> entities = await _dbContext.Users.ToListAsync();
 
-            if(entities.Count == 0)
+            if (entities.Count == 0)
             {
                 return new CollectionResult<User>()
                 {
@@ -71,7 +71,6 @@ namespace DataAccessLayer.Repositories
                 .Where(u => u.Id == id)
                 .ExecuteDeleteAsync();
 
-
             if(countRemovedUsers == 0)
             {
                 return new BaseResult<Guid>()
@@ -99,7 +98,7 @@ namespace DataAccessLayer.Repositories
                 .SetProperty(p => p.Login, entity.Login)
                 .SetProperty(p => p.Email, entity.Email)
                 .SetProperty(p => p.Password, entity.Password)
-                .SetProperty(p => p.WalletBalance, entity.WalletBalance)
+                .SetProperty(p => p.WalletBalance, p => p.WalletBalance + entity.WalletBalance)
                 .SetProperty(p => p.BirthDate, entity.BirthDate));
 
             if(updatedUsersCount == 0)
@@ -114,6 +113,25 @@ namespace DataAccessLayer.Repositories
             await _dbContext.SaveChangesAsync();
 
             return new BaseResult<User>() { Data = user };
+        }
+
+        public async Task<BaseResult<User>> GetByIdAsync(Guid id)
+        {
+            UserEntity user = await _dbContext.Users
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if(user == null)
+            {
+                return new BaseResult<User>()
+                {
+                    ErrorCode = (int)ErrorCodes.UserNotFound,
+                    ErrorMessage = ErrorCodes.UserNotFound.ToString(),
+                };
+            }
+
+            User result = await _userMapper.EntityToModelAsync(user);
+
+            return new BaseResult<User>() { Data = result };
         }
     }
 }

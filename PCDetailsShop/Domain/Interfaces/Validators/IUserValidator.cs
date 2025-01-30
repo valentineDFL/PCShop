@@ -7,6 +7,10 @@ namespace Domain.Interfaces.Validators
 {
     public interface IUserValidator : IBaseValidator<User>
     {
-        public BaseResult ExistsValidation(User user, CreateUserDto dto);
+        public BaseResult<User> ExistsValidation(User user, CreateUserDto dto);
+
+        public BaseResult<User> ExistsValidation(User user, UpdateUserDto dto);
+
+        public BaseResult<User> PasswordValidation(string userPassword, string oldPassword);
     }
 }

@@ -10,12 +10,7 @@ namespace PCDetailsShop.API.Controllers
     [Route("[controller]/[action]")]
     public class ProductController : ControllerBase
     {
-        private readonly ProductService _productService;
 
-        public ProductController(ProductService productService)
-        {
-            _productService = productService;
-        }
 
     }
 }

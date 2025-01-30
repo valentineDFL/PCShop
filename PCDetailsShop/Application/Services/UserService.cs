@@ -12,6 +12,8 @@ using Domain.Models;
 using DataAccessLayer.Entities;
 using Domain.Interfaces.MappingW;
 using Microsoft.EntityFrameworkCore.Query.Internal;
+using Microsoft.EntityFrameworkCore.Storage;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure.Internal;
 
 namespace Application.Services
 {
@@ -34,43 +36,152 @@ namespace Application.Services
             _passwordEncrypter = passwordEncrypter;
         }
 
-        public async Task<BaseResult<UserDto>> GetUserByIdAsync(Guid id)
+        public async Task<BaseResult<User>> GetUserByIdAsync(Guid id)
+        {
+            try
+            {
+                BaseResult<User> user = await _userRepository.GetByIdAsync(id);
+
+                return user;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, ex.Message);
+
+                return new BaseResult<User>()
+                {
+                    ErrorCode = (int)ErrorCodes.InternalServerError,
+                    ErrorMessage = ErrorCodes.InternalServerError.ToString(),
+                };
+            }
+        }
+
+        public async Task<CollectionResult<User>> GetAllUsersAsync()
         {
             try
             {
                 CollectionResult<User> users = await _userRepository.GetAllAsync();
 
-                User user = users.Data.Where(u => u.Id == id)
-                    .FirstOrDefault();
+                return users;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, ex.Message);
 
-                BaseResult validationResult = _userValidator.ValidateOnNull(user);
-
-                if (!validationResult.IsSuccess)
+                return new CollectionResult<User>()
                 {
-                    return new BaseResult<UserDto>()
+                    ErrorCode = (int)ErrorCodes.InternalServerError,
+                    ErrorMessage = ErrorCodes.InternalServerError.ToString(),
+                };
+            }
+        }
+
+        public async Task<BaseResult<User>> CreateUserAsync(CreateUserDto dto)
+        {
+            try
+            {
+                CollectionResult<User> users = await _userRepository.GetAllAsync();
+
+                if (users.IsSuccess)
+                {
+                    User findedUser = users.Data.FirstOrDefault(u => u.Login == dto.Login || u.Email == dto.Email);
+                    BaseResult<User> existsValidationResult = _userValidator.ExistsValidation(findedUser, dto);
+
+                    if (!existsValidationResult.IsSuccess)
+                    return existsValidationResult;
+                }
+
+                return await CreateUserAndCart(dto);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, ex.Message);
+
+                return new BaseResult<User>()
+                {
+                    ErrorCode = (int)ErrorCodes.InternalServerError,
+                    ErrorMessage = ErrorCodes.InternalServerError.ToString(),
+                };
+            }
+        }
+
+        private async Task<BaseResult<User>> CreateUserAndCart(CreateUserDto dto)
+        {
+            Guid userId = Guid.NewGuid();
+            Guid CartId = Guid.NewGuid();
+
+
+            string password = _passwordEncrypter.Encrypt(dto.Password);
+            User user = new User(userId, dto.Login, dto.Email, password, 0, dto.BirthDate, DateTime.UtcNow, null, CartId);
+            BaseResult<User> result = await _userRepository.CreateAsync(user);
+
+            Cart userCart = new Cart(CartId, 0, 0, null, userId, new List<Product>());
+            await _cartRepository.CreateAsync(userCart);
+
+            return result;
+        }
+
+        public async Task<BaseResult<Guid>> DeleteUserByIdAsync(Guid id)
+        {
+            try
+            {
+                BaseResult<Guid> deletedUser = await _userRepository.DeleteAsync(id);
+
+                return deletedUser;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, ex.Message);
+
+                return new BaseResult<Guid>()
+                {
+                    ErrorCode = (int)ErrorCodes.InternalServerError,
+                    ErrorMessage = ErrorCodes.InternalServerError.ToString(),
+                };
+            }
+        }
+
+        public async Task<BaseResult<User>> UpdateUserAsync(UpdateUserDto dto)
+        {
+            try
+            {
+                if(dto.summForAdd < 0)
+                {
+                    return new BaseResult<User>()
                     {
-                        ErrorCode = validationResult.ErrorCode,
-                        ErrorMessage = validationResult.ErrorMessage,
+                        ErrorCode = (int)ErrorCodes.TheAmountToBeCreditedMustBeGreaterThanZero,
+                        ErrorMessage = ErrorCodes.TheAmountToBeCreditedMustBeGreaterThanZero.ToString(),
                     };
                 }
 
-                UserDto result = new UserDto
-                   (user.Id,
-                    user.Login,
-                    user.Email,
-                    user.BirthDate,
-                    user.RegistrationDate);
+                BaseResult<User> userForUpdate = await _userRepository.GetByIdAsync(dto.Id);
 
-                return new BaseResult<UserDto>()
-                {
-                    Data = result
-                };
+                if (!userForUpdate.IsSuccess)
+                    return userForUpdate;
+
+                User user = _userRepository.GetAllAsync()
+                    .Result
+                    .Data
+                    .FirstOrDefault(u => u.Login == dto.Login || u.Email == dto.Email);
+
+                BaseResult<User> existValidateResult = _userValidator.ExistsValidation(user, dto);
+
+                if(!existValidateResult.IsSuccess)
+                    return existValidateResult;
+
+                string oldPassword = _passwordEncrypter.Encrypt(dto.OldPassword);
+                BaseResult<User> passwordValidationResult = _userValidator.PasswordValidation(userForUpdate.Data.Password, oldPassword);
+
+                if (!passwordValidationResult.IsSuccess)
+                    return passwordValidationResult;
+
+                return await UpdateUser(dto);
             }
             catch (Exception ex)
             {
                 _logger.Error(ex, ex.Message);
 
-                return new BaseResult<UserDto>()
+                return new BaseResult<User>()
                 {
                     ErrorCode = (int)ErrorCodes.InternalServerError,
                     ErrorMessage = ErrorCodes.InternalServerError.ToString()
@@ -78,109 +189,15 @@ namespace Application.Services
             }
         }
 
-        public async Task<BaseResult<UserDto>> CreateUserAsync(CreateUserDto dto)
+        private async Task<BaseResult<User>> UpdateUser(UpdateUserDto dto)
         {
-            try
-            {
-                //List<User> users = await _userRepository.GetAllAsync();
+            string newPassword = _passwordEncrypter.Encrypt(dto.NewPassword);
 
-                //User user = users.Where(u => u.Login == dto.Login || u.Email == dto.Email)
-                //    .FirstOrDefault();
+            User updateData = new User(dto.Id, dto.Login, dto.Email, newPassword, dto.summForAdd, DateTime.MinValue, DateTime.MinValue, null, Guid.Empty);
 
-                //BaseResult validateResult = _userValidator.ExistsValidation(user, dto);
+            BaseResult<User> updateResult = await _userRepository.UpdateAsync(updateData);
 
-                //if (!validateResult.IsSuccess)
-                //{
-                //    return new BaseResult<UserDto>()
-                //    {
-                //        ErrorCode = validateResult.ErrorCode,
-                //        ErrorMessage = validateResult.ErrorMessage,
-                //    };
-                //}
-
-                Guid userId = Guid.NewGuid();
-                Guid cartId = Guid.NewGuid();
-
-                Cart cart = new Cart
-                        (
-                             id: cartId,
-                             cartTotalPrice: 0,
-                             cartTotalWeight: 0,
-                             user: null,
-                             userId: userId,
-                             products: new List<Product>()
-                        );
-
-                User user = new User
-                        (
-                            id: userId,
-                            login: dto.Login,
-                            email: dto.Email,
-                            password: _passwordEncrypter.Encrypt(dto.Password),
-                            walletBalance: 0,
-                            birthDate: dto.BirthDate,
-                            registrationDate: DateTime.UtcNow,
-                            cart: cart,
-                            cartId: cartId
-                        );
-
-                await _userRepository.CreateAsync(user);
-                //await _cartRepository.CreateAsync(cart);
-
-                return new BaseResult<UserDto>()
-                {
-                    Data = new UserDto
-                    (
-                        user.Id,
-                        user.Login,
-                        user.Email,
-                        user.BirthDate,
-                        user.RegistrationDate
-                    )
-                };
-                
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, ex.Message);
-
-                return new BaseResult<UserDto>()
-                {
-                    ErrorCode = (int)ErrorCodes.InternalServerError,
-                    ErrorMessage = ErrorCodes.InternalServerError.ToString()
-                };
-            }
-        }
-
-        public async Task<BaseResult<UserDto>> DeleteUserByIdAsync(Guid id)
-        {
-            try
-            {
-
-            }
-            catch (Exception ex)
-            {
-                _logger.Error (ex, ex.Message);
-
-                return new BaseResult<UserDto>()
-                {
-                    ErrorCode = (int)ErrorCodes.InternalServerError,
-                    ErrorMessage = ErrorCodes.InternalServerError.ToString()
-                };
-            }
-
-
-            throw new NotImplementedException();
-        }
-
-        public Task<BaseResult<UserDto>> UpdateUserAsync(UpdateUserDto dto)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<BaseResult<UserDto>> IncreaseUserWalletBalanceAsync(Guid id, decimal increaseSumm)
-        {
-            throw new NotImplementedException();
+            return updateResult;
         }
     }
 }

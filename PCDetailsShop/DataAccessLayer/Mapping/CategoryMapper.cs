@@ -28,7 +28,7 @@ namespace DataAccessLayer.Mapping
 
             await Task.Run(() => 
             {
-                foreach (var category in categories)
+                foreach (Category category in categories)
                 {
                     result.Add(ModelToEntity(category));
                 }

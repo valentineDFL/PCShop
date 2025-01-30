@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DataAccessLayer.Repositories
 {
-    internal class CategoryRepository : IRepository<Category>
+    internal class CategoryRepository // : IRepository<Category>
     {
         private readonly PcShopDbContext _dbContext;
         private readonly CategoryMapper _categoryMapper;

@@ -15,7 +15,6 @@ using Domain.Interfaces.Encrypt;
 using Application.Encrypters;
 using Application.Validation.FluentValidations.UserFluent;
 using Domain.Dto.CategoryDtos;
-using Application.Validation.FluentValidations.CategoryFluent;
 
 namespace Application.DependencyInjection
 {
@@ -23,7 +22,6 @@ namespace Application.DependencyInjection
     {
         public static void AddApplication(this IServiceCollection services)
         {
-            
             services.AddScoped<IEncrypter, ShaEncrypter>();
 
             InitUserService(services);
@@ -54,10 +52,7 @@ namespace Application.DependencyInjection
 
         private static void InitCategoryService(this IServiceCollection services)
         {
-
             
-            services.AddScoped<IValidator<CreateCategoryDto>, CreateCategoryValidator>();
-            services.AddScoped<IValidator<UpdateCategoryDto>, UpdateCategoryValidator>();
         }
     }
 }

@@ -102,36 +102,5 @@
         "StatusCode": 200
       }
     ]
-  },
-  {
-    "ContainingType": "PCDetailsShop.API.Controllers.UserController",
-    "Method": "UpdateUserWalletBalance",
-    "RelativePath": "User/UpdateUserWalletBalance",
-    "HttpMethod": "PUT",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "id",
-        "Type": "System.Guid",
-        "IsRequired": false
-      },
-      {
-        "Name": "increaseSumm",
-        "Type": "System.Decimal",
-        "IsRequired": false
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "Domain.Dto.UserDtos.UserDto",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
   }
 ]

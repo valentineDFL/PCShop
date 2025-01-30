@@ -1,10 +1,12 @@
 ﻿using Domain.Dto.UserDtos;
 using Domain.Interfaces.Services;
 using Domain.Interfaces.Validators;
+using Domain.Models;
 using Domain.Result;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
+using PCDetailsShop.API.DtoMapping;
 
 namespace PCDetailsShop.API.Controllers
 {
@@ -15,26 +17,32 @@ namespace PCDetailsShop.API.Controllers
         private readonly IUserService _userService;
         private readonly IValidator<CreateUserDto> _createUserValidator;
         private readonly IValidator<UpdateUserDto> _updateUserValidator;
+        private readonly ResponseDtoMapper _userDtoMapper;
 
-        public UserController(IUserService userService, IValidator<CreateUserDto> createUserValidator, IValidator<UpdateUserDto> updateUserValidator)
+        public UserController(IUserService userService, IValidator<CreateUserDto> createUserValidator, 
+            IValidator<UpdateUserDto> updateUserValidator, ResponseDtoMapper userDtoMapper)
         {
             _userService = userService;
             _createUserValidator = createUserValidator;
             _updateUserValidator = updateUserValidator;
+            _userDtoMapper = userDtoMapper;
         }
 
         [HttpPost("CreateUser")]
         public async Task<ActionResult<BaseResult<UserDto>>> CreateUserAsync(CreateUserDto dto)
         {
-            ValidationResult result = await _createUserValidator.ValidateAsync(dto);
+            ValidationResult validationResult = await _createUserValidator.ValidateAsync(dto);
 
-            if (!result.IsValid)
-                return BadRequest(result);
+            if (!validationResult.IsValid)
+                return BadRequest(validationResult);
             
-            BaseResult<UserDto> response = await _userService.CreateUserAsync(dto);
+            BaseResult<User> response = await _userService.CreateUserAsync(dto);
 
             if (response.IsSuccess)
-                return Ok(response);
+            {
+                BaseResult<UserDto> result = _userDtoMapper.FromModelToDto(response.Data);
+                return Ok(result);
+            }
 
             return BadRequest(response);
         }
@@ -42,7 +50,7 @@ namespace PCDetailsShop.API.Controllers
         [HttpDelete("DeleteUser")]
         public async Task<ActionResult<BaseResult<UserDto>>> DeleteUserByIdAsync(Guid id)
         {
-            BaseResult<UserDto> response = await _userService.DeleteUserByIdAsync(id);
+            BaseResult<Guid> response = await _userService.DeleteUserByIdAsync(id);
 
             if(response.IsSuccess)
                 return Ok(response);
@@ -53,10 +61,13 @@ namespace PCDetailsShop.API.Controllers
         [HttpGet("GetUserById")]
         public async Task<ActionResult<UserDto>> GetUserById(Guid id)
         {
-            BaseResult<UserDto> response = await _userService.GetUserByIdAsync(id);
+            BaseResult<User> response = await _userService.GetUserByIdAsync(id);
 
             if (response.IsSuccess)
-                return Ok(response);
+            {
+                BaseResult<UserDto> result = _userDtoMapper.FromModelToDto(response.Data);
+                return Ok(result);
+            }
 
             return BadRequest(response);
         }
@@ -69,18 +80,7 @@ namespace PCDetailsShop.API.Controllers
             if(!result.IsValid)
                 return BadRequest(result);
 
-            BaseResult<UserDto> response = await _userService.UpdateUserAsync(dto);
-
-            if(response.IsSuccess)
-                return Ok(response);
-
-            return BadRequest(response);
-        }
-
-        [HttpPut("UpdateUserWalletBalance")]
-        public async Task<ActionResult<UserDto>> UpdateUserWalletBalance(Guid id, decimal increaseSumm)
-        {
-            BaseResult<UserDto> response = await _userService.IncreaseUserWalletBalanceAsync(id, increaseSumm);
+            BaseResult<User> response = await _userService.UpdateUserAsync(dto);
 
             if(response.IsSuccess)
                 return Ok(response);

@@ -19,7 +19,9 @@ namespace Domain.Enums
         UserWithTurnerdEmailAndLoginAlreadyExists = 16,
 
         NewUserPasswordCannotBeRepeatedWithTheOldOne = 17,
+        TheOldPasswordDoesNotMatchThePassword = 18,
 
+        TheAmountToBeCreditedMustBeGreaterThanZero = 19,
 
         CartNotFound = 21,
         CartsNotFound = 22,

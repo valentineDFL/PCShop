@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Domain.Dto.UserDtos;
+using Domain.Enums;
 using FluentValidation;
 
 namespace Application.Validation.FluentValidations.UserFluent
@@ -12,10 +13,24 @@ namespace Application.Validation.FluentValidations.UserFluent
     {
         public CreateUserValidator()
         {
-            RuleFor(x => x.Login).NotEmpty().MaximumLength(32);
-            RuleFor(x => x.Password).NotEmpty().MaximumLength(32);
-            RuleFor(x => x.Email).NotEmpty().MaximumLength(32);
-            RuleFor(x => x.BirthDate).NotEmpty();
+            RuleFor(x => x.Login).NotEmpty()
+                .Must(IllegalSymbols.ContainsIllegalCharacter)
+                .WithMessage(ValidationMessages.TurnedLoginContainIllegalCharacters)
+                .MaximumLength(32);
+
+            RuleFor(x => x.Password).NotEmpty()
+                .MaximumLength(32)
+                .Must(IllegalSymbols.ContainsIllegalCharacter)
+                .WithMessage(ValidationMessages.TurnedPasswordContainIllegalCharacters);
+
+            RuleFor(x => x.Email).NotEmpty()
+                .MaximumLength(32)
+                .Must(IllegalSymbols.ContainsIllegalCharacter)
+                .WithMessage(ValidationMessages.TurnedEmailContainIllegalCharacters);
+
+            RuleFor(x => x.BirthDate).NotEmpty()
+                .Must(x => x.Year >= 18)
+                .WithMessage(ValidationMessages.TheUserMustBeOver16YearsOfAge);
         }
     }
 }
