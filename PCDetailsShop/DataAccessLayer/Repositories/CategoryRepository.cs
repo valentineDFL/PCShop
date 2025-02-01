@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DataAccessLayer.Repositories
 {
-    internal class CategoryRepository // : IRepository<Category>
+    internal class CategoryRepository : ICategoryRepository
     {
         private readonly PcShopDbContext _dbContext;
         private readonly CategoryMapper _categoryMapper;
@@ -28,7 +28,9 @@ namespace DataAccessLayer.Repositories
 
         public async Task<CollectionResult<Category>> GetAllAsync()
         {
-            List<CategoryEntity> categoties = await _dbContext.Categories.ToListAsync();
+            List<CategoryEntity> categoties = await _dbContext.Categories
+                .Include(c => c.Products)
+                .ToListAsync();
 
             if(categoties.Count == 0)
             {
@@ -46,6 +48,46 @@ namespace DataAccessLayer.Repositories
                 Count = result.Count,
                 Data = result
             };
+        }
+
+        public async Task<BaseResult<Category>> GetByIdAsync(Guid id)
+        {
+            CategoryEntity categoryEntity = await _dbContext.Categories
+                .Include(c => c.Products)
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if(categoryEntity == null)
+            {
+                return new BaseResult<Category>()
+                {
+                    ErrorCode = (int)ErrorCodes.CategoryNotFound,
+                    ErrorMessage= ErrorCodes.CategoryNotFound.ToString()
+                };
+            }
+
+            Category category = _categoryMapper.EntityToModel(categoryEntity);
+
+            return new BaseResult<Category>() { Data = category };
+        }
+
+        public async Task<BaseResult<Category>> GetByNameAsync(string partName)
+        {
+            CategoryEntity categoryEntity = await _dbContext.Categories
+                .Include(c => c.Products)
+                .FirstOrDefaultAsync(c => c.Name.Contains(partName));
+
+            if (categoryEntity == null)
+            {
+                return new BaseResult<Category>()
+                {
+                    ErrorCode = (int)ErrorCodes.CategoryNotFound,
+                    ErrorMessage = ErrorCodes.CategoryNotFound.ToString()
+                };
+            }
+
+            Category category = _categoryMapper.EntityToModel(categoryEntity);
+
+            return new BaseResult<Category>() { Data = category };
         }
 
         public async Task<BaseResult<Category>> CreateAsync(Category category)

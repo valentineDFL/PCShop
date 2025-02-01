@@ -1,11 +1,12 @@
 ﻿using Domain.Dto.UserDtos;
+using Domain.Interfaces.MappingW;
 using Domain.Models;
 using Domain.Result;
 using Microsoft.EntityFrameworkCore.Storage.Json;
 
 namespace PCDetailsShop.API.DtoMapping
 {
-    public class ResponseDtoMapper
+    public class UserResponseDtoMapper : IBaseMapper<User, UserDto>
     {
         public BaseResult<UserDto> FromModelToDto(User user)
         {
@@ -20,7 +21,7 @@ namespace PCDetailsShop.API.DtoMapping
             return new UserDto(user.Id, user.Login, user.Email, user.BirthDate, user.RegistrationDate);
         }
 
-        public async Task<CollectionResult<UserDto>> FromModelsToDtoAsync(List<User> users)
+        public async Task<CollectionResult<UserDto>> FromModelsToDtosAsync(List<User> users)
         {
             List<UserDto> dtos = new List<UserDto>();
             

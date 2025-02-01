@@ -24,6 +24,8 @@ namespace DataAccessLayer
 
         public DbSet<CategoryEntity> Categories { get; set; }
 
+        public DbSet<CharacteristicEntity> Characteristics { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             

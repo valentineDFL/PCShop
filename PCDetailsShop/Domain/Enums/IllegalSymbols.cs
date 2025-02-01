@@ -18,7 +18,7 @@ namespace Domain.Enums
             "#",            
         };
 
-        public static bool ContainsIllegalCharacter(string value)
+        public static bool NotContainsIllegalCharacter(string value)
         {
             foreach(string str in IllegalCharacters)
             {

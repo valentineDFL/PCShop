@@ -14,5 +14,7 @@ namespace DataAccessLayer.Entities
 
         public List<ProductEntity> Products { get; set; } // при маппинге делать налл категорий
         //  после маппить категории, а потом делать наоборот.
+
+        public List<CharacteristicEntity> Characteristics { get; set; }
     }
 }

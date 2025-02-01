@@ -18,6 +18,9 @@ namespace DataAccessLayer.Configurations
 
             builder.HasMany(c => c.Products)
                 .WithMany(p => p.Categories);
+
+            builder.HasMany(c => c.Characteristics)
+                .WithMany();
         }
     }
 }

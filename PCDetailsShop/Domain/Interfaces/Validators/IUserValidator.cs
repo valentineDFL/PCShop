@@ -5,12 +5,20 @@ using Domain.Result;
 
 namespace Domain.Interfaces.Validators
 {
-    public interface IUserValidator : IBaseValidator<User>
+    public interface IUserValidator
     {
-        public BaseResult<User> ExistsValidation(User user, CreateUserDto dto);
+        public BaseResult<User> ValidateOnExists(User user, CreateUserDto dto);
 
-        public BaseResult<User> ExistsValidation(User user, UpdateUserDto dto);
+        public BaseResult<string> ValidateOnLoginExists(User user, string newLogin);
 
-        public BaseResult<User> PasswordValidation(string userPassword, string oldPassword);
+        public BaseResult<string> ValidateOnEmailExists(User user, string newEmail);
+
+        public BaseResult<string> ValidateOnLoginRepeat(string oldLogin, string newLogin);
+
+        public BaseResult<string> ValidateOnEmailRepeat(string oldEmail, string newEmail);
+
+        public BaseResult<string> ValidateOnPasswordRepeat(string userPassword, string oldPassword);
+
+        public BaseResult<decimal> ValidateOnCredit(decimal creditToAmount);
     }
 }

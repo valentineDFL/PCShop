@@ -19,22 +19,40 @@ namespace Domain.Enums
         UserWithTurnerdEmailAndLoginAlreadyExists = 16,
 
         NewUserPasswordCannotBeRepeatedWithTheOldOne = 17,
-        TheOldPasswordDoesNotMatchThePassword = 18,
 
-        TheAmountToBeCreditedMustBeGreaterThanZero = 19,
+        TheOldLoginDoesNotMatchTheLogin = 18,
+        TheOldEmailDoesNotMatchThePassword = 19,
+        TheOldPasswordDoesNotMatchThePassword = 20,
 
-        CartNotFound = 21,
-        CartsNotFound = 22,
+        TurnedLoginContainIllegalCharacters = 21,
+        TurnedEmailContainIllegalCharacters = 22,
+        TurnedPasswordContainIllegalCharacters = 23,
+
+        TurnedOldPasswordContainIllegalCharacters = 24,
+
+        TheAmountToBeCreditedMustBeGreaterThanZero = 25,
+
+        TheAmountToBeCreditedMustBeANumber = 26,
+
+        NotEnoughFundsInTheUsersBalance = 26,
+
+
+        CartNotFound = 31,
+        CartsNotFound = 32,
 
 
 
-        ProductNotFound = 31,
-        ProductsNotFound = 32,
-        ProductAlreadyExists = 33,
+        ProductNotFound = 41,
+        ProductsNotFound = 42,
+        ProductAlreadyExists = 43,
 
 
-        CategoryNotFound = 41,
-        CategoriesNotFound = 42,
-        
+        CategoryNotFound = 51,
+        CategoriesNotFound = 52,
+        CategoryWithTurnedNameAlreadyExists = 53,
+
+        TheCategoryShouldNotContainRepetitiveProducts = 54,
+
+        ThereIsNoSuchProductInTheCategory = 55,
     }
 }

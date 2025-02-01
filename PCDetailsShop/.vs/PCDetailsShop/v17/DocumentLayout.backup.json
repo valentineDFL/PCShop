@@ -7,20 +7,20 @@
       "RelativeMoniker": "D:0:0:{F4C29C18-1CFE-418D-A753-AC3BA4197FB6}|Application\\Application.csproj|solutionrelative:application\\validation\\uservalidations\\uservalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E85EFADF-54C6-424E-AD94-E38DA490AF55}|DataAccessLayer\\DataAccessLayer.csproj|e:\\githubrepositories\\pcshop\\pcdetailsshop\\dataaccesslayer\\repositories\\cartrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E85EFADF-54C6-424E-AD94-E38DA490AF55}|DataAccessLayer\\DataAccessLayer.csproj|solutionrelative:dataaccesslayer\\repositories\\cartrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{F4C29C18-1CFE-418D-A753-AC3BA4197FB6}|Application\\Application.csproj|e:\\githubrepositories\\pcshop\\pcdetailsshop\\application\\services\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F4C29C18-1CFE-418D-A753-AC3BA4197FB6}|Application\\Application.csproj|solutionrelative:application\\services\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{F4C29C18-1CFE-418D-A753-AC3BA4197FB6}|Application\\Application.csproj|e:\\githubrepositories\\pcshop\\pcdetailsshop\\application\\dependencyinjection\\dependencyinjection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{F4C29C18-1CFE-418D-A753-AC3BA4197FB6}|Application\\Application.csproj|solutionrelative:application\\dependencyinjection\\dependencyinjection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{EF049E34-9045-4FF7-8B2E-56ABB80E7316}|PCDetailsShop.API\\PCDetailsShop.API.csproj|e:\\githubrepositories\\pcshop\\pcdetailsshop\\pcdetailsshop.api\\controllers\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EF049E34-9045-4FF7-8B2E-56ABB80E7316}|PCDetailsShop.API\\PCDetailsShop.API.csproj|solutionrelative:pcdetailsshop.api\\controllers\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{EF049E34-9045-4FF7-8B2E-56ABB80E7316}|PCDetailsShop.API\\PCDetailsShop.API.csproj|e:\\githubrepositories\\pcshop\\pcdetailsshop\\pcdetailsshop.api\\dependencyinjection\\dependencyinjection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{EF049E34-9045-4FF7-8B2E-56ABB80E7316}|PCDetailsShop.API\\PCDetailsShop.API.csproj|solutionrelative:pcdetailsshop.api\\dependencyinjection\\dependencyinjection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E85EFADF-54C6-424E-AD94-E38DA490AF55}|DataAccessLayer\\DataAccessLayer.csproj|e:\\githubrepositories\\pcshop\\pcdetailsshop\\dataaccesslayer\\mapping\\cartmapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E85EFADF-54C6-424E-AD94-E38DA490AF55}|DataAccessLayer\\DataAccessLayer.csproj|solutionrelative:dataaccesslayer\\mapping\\cartmapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{EF049E34-9045-4FF7-8B2E-56ABB80E7316}|PCDetailsShop.API\\PCDetailsShop.API.csproj|e:\\githubrepositories\\pcshop\\pcdetailsshop\\pcdetailsshop.api\\dtomapping\\responsedtomapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{EF049E34-9045-4FF7-8B2E-56ABB80E7316}|PCDetailsShop.API\\PCDetailsShop.API.csproj|solutionrelative:pcdetailsshop.api\\dtomapping\\responsedtomapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E85EFADF-54C6-424E-AD94-E38DA490AF55}|DataAccessLayer\\DataAccessLayer.csproj|e:\\githubrepositories\\pcshop\\pcdetailsshop\\dataaccesslayer\\repositories\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E85EFADF-54C6-424E-AD94-E38DA490AF55}|DataAccessLayer\\DataAccessLayer.csproj|solutionrelative:dataaccesslayer\\repositories\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -72,61 +72,61 @@
               "RelativeDocumentMoniker": "Application\\Validation\\UserValidations\\UserValidator.cs",
               "ToolTip": "E:\\GithubRepositories\\PCShop\\PCDetailsShop\\Application\\Validation\\UserValidations\\UserValidator.cs",
               "RelativeToolTip": "Application\\Validation\\UserValidations\\UserValidator.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAFsAAABbAAAAAAAAAA==",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAAG8AAAAeAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-01-28T22:16:31.981Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "CartRepository.cs",
-              "DocumentMoniker": "E:\\GithubRepositories\\PCShop\\PCDetailsShop\\DataAccessLayer\\Repositories\\CartRepository.cs",
-              "RelativeDocumentMoniker": "DataAccessLayer\\Repositories\\CartRepository.cs",
-              "ToolTip": "E:\\GithubRepositories\\PCShop\\PCDetailsShop\\DataAccessLayer\\Repositories\\CartRepository.cs",
-              "RelativeToolTip": "DataAccessLayer\\Repositories\\CartRepository.cs",
-              "ViewState": "AgIAABQAAAAAAAAAAAAQwFIAAAA0AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-01-29T01:26:28.496Z",
+              "WhenOpened": "2025-02-01T03:56:27.024Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "DependencyInjection.cs",
-              "DocumentMoniker": "E:\\GithubRepositories\\PCShop\\PCDetailsShop\\Application\\DependencyInjection\\DependencyInjection.cs",
-              "RelativeDocumentMoniker": "Application\\DependencyInjection\\DependencyInjection.cs",
-              "ToolTip": "E:\\GithubRepositories\\PCShop\\PCDetailsShop\\Application\\DependencyInjection\\DependencyInjection.cs",
-              "RelativeToolTip": "Application\\DependencyInjection\\DependencyInjection.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAABcAAAAJAAAAAAAAAA==",
+              "Title": "UserController.cs",
+              "DocumentMoniker": "E:\\GithubRepositories\\PCShop\\PCDetailsShop\\PCDetailsShop.API\\Controllers\\UserController.cs",
+              "RelativeDocumentMoniker": "PCDetailsShop.API\\Controllers\\UserController.cs",
+              "ToolTip": "E:\\GithubRepositories\\PCShop\\PCDetailsShop\\PCDetailsShop.API\\Controllers\\UserController.cs",
+              "RelativeToolTip": "PCDetailsShop.API\\Controllers\\UserController.cs",
+              "ViewState": "AgIAAHsAAAAAAAAAAAAuwJ4AAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-01-29T01:26:17.477Z",
+              "WhenOpened": "2025-02-01T03:50:56.665Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "DependencyInjection.cs",
-              "DocumentMoniker": "E:\\GithubRepositories\\PCShop\\PCDetailsShop\\PCDetailsShop.API\\DependencyInjection\\DependencyInjection.cs",
-              "RelativeDocumentMoniker": "PCDetailsShop.API\\DependencyInjection\\DependencyInjection.cs",
-              "ToolTip": "E:\\GithubRepositories\\PCShop\\PCDetailsShop\\PCDetailsShop.API\\DependencyInjection\\DependencyInjection.cs",
-              "RelativeToolTip": "PCDetailsShop.API\\DependencyInjection\\DependencyInjection.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAFAAAAAAAAAA==",
+              "DocumentIndex": 1,
+              "Title": "UserService.cs",
+              "DocumentMoniker": "E:\\GithubRepositories\\PCShop\\PCDetailsShop\\Application\\Services\\UserService.cs",
+              "RelativeDocumentMoniker": "Application\\Services\\UserService.cs",
+              "ToolTip": "E:\\GithubRepositories\\PCShop\\PCDetailsShop\\Application\\Services\\UserService.cs",
+              "RelativeToolTip": "Application\\Services\\UserService.cs",
+              "ViewState": "AgIAAKMAAAAAAAAAAAAuwGIAAABOAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-01-29T00:13:49.378Z",
+              "WhenOpened": "2025-02-01T03:47:28.353Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 4,
-              "Title": "ResponseDtoMapper.cs",
-              "DocumentMoniker": "E:\\GithubRepositories\\PCShop\\PCDetailsShop\\PCDetailsShop.API\\DtoMapping\\ResponseDtoMapper.cs",
-              "RelativeDocumentMoniker": "PCDetailsShop.API\\DtoMapping\\ResponseDtoMapper.cs",
-              "ToolTip": "E:\\GithubRepositories\\PCShop\\PCDetailsShop\\PCDetailsShop.API\\DtoMapping\\ResponseDtoMapper.cs",
-              "RelativeToolTip": "PCDetailsShop.API\\DtoMapping\\ResponseDtoMapper.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAArAAAAAAAAAA==",
+              "Title": "UserRepository.cs",
+              "DocumentMoniker": "E:\\GithubRepositories\\PCShop\\PCDetailsShop\\DataAccessLayer\\Repositories\\UserRepository.cs",
+              "RelativeDocumentMoniker": "DataAccessLayer\\Repositories\\UserRepository.cs",
+              "ToolTip": "E:\\GithubRepositories\\PCShop\\PCDetailsShop\\DataAccessLayer\\Repositories\\UserRepository.cs",
+              "RelativeToolTip": "DataAccessLayer\\Repositories\\UserRepository.cs",
+              "ViewState": "AgIAABUAAAAAAAAAAAAmwDgAAAAsAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-01-29T00:06:57.563Z",
+              "WhenOpened": "2025-02-01T03:47:13.694Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "CartMapper.cs",
+              "DocumentMoniker": "E:\\GithubRepositories\\PCShop\\PCDetailsShop\\DataAccessLayer\\Mapping\\CartMapper.cs",
+              "RelativeDocumentMoniker": "DataAccessLayer\\Mapping\\CartMapper.cs",
+              "ToolTip": "E:\\GithubRepositories\\PCShop\\PCDetailsShop\\DataAccessLayer\\Mapping\\CartMapper.cs",
+              "RelativeToolTip": "DataAccessLayer\\Mapping\\CartMapper.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAwB4AAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-01T03:47:01.793Z",
               "EditorCaption": ""
             }
           ]

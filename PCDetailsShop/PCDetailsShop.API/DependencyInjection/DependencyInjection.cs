@@ -1,4 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
+using Domain.Dto.UserDtos;
+using Domain.Interfaces.MappingW;
+using Domain.Models;
 using PCDetailsShop.API.DtoMapping;
 
 namespace PCDetailsShop.API.DependencyInjection
@@ -7,7 +10,7 @@ namespace PCDetailsShop.API.DependencyInjection
     {
         public static void AddDtoMapping(this IServiceCollection services)
         {
-            services.AddScoped(typeof(ResponseDtoMapper));
+            services.AddScoped<IBaseMapper<User, UserDto>, UserResponseDtoMapper>();
         }
     }
 }

@@ -6,32 +6,31 @@ using System.Text;
 using System.Threading.Tasks;
 using Domain.Dto.CategoryDtos;
 using Domain.Dto.ProductDtos;
+using Domain.Models;
 using Domain.Result;
 
 namespace Domain.Interfaces.Services
 {
     public interface IProductService
     {
-        public Task<BaseResult<ProductDto>> GetAllProductsAsync();
+        public Task<CollectionResult<Product>> GetAllAsync();
 
-        public Task<BaseResult<ProductDto>> GetProductByIdAsync(Guid id);
+        public Task<BaseResult<Product>> GetByIdAsync(Guid id);
 
-        public Task<CollectionResult<ProductDto>> GetProductsByNamePartAsync(string name);
+        public Task<CollectionResult<Product>> GetByNamePartAsync(string namePart);
 
-        public Task<BaseResult<ProductDto>> GetProductsByCategoryIdAsync(Guid id);
+        public Task<BaseResult<Product>> GetByCategoryNameAsync(string categoryName);
 
-        public Task<BaseResult<ProductDto>> GetProductsByCategoryAsync(string name);
+        public Task<BaseResult<Product>> CreateAsync(CreateProductDto dto);
 
-        public Task<BaseResult<ProductDto>> CreateProductAsync(CreateProductDto dto);
+        public Task<BaseResult<Product>> DeleteByIdAsync(Guid id);
 
-        public Task<BaseResult<ProductDto>> DeleteProductByIdAsync(Guid id);
+        public Task<BaseResult<Product>> UpdateByIdAsync(UpdateProductDto dto);
 
-        public Task<BaseResult<ProductDto>> UpdateProductByIdAsync(Guid id);
+        public Task<BaseResult<Guid>> AddCategoryAsync(string categoryName);
 
-        public Task<BaseResult<CategoryDto>> AddCategoryToProductAsync(CategoryDto category);
+        public Task<BaseResult<Guid>> RemoveCategoryFromProductAsync(string categoryName);
 
-        public Task<BaseResult<CategoryDto>> RemoveCategoryFromProductAsync(CategoryDto category);
-
-        public Task<BaseResult<ProductDto>> AddProductToCartAsync(Guid productId, Guid userId);
+        public Task<BaseResult<Product>> AddProductToCartAsync(Guid productId, Guid userId);
     } 
 }

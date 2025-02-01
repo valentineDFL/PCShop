@@ -8,26 +8,13 @@ using Domain.Enums;
 using Domain.Interfaces.Validators;
 using Domain.Models;
 using Domain.Result;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Application.Validation.UserValidations
 {
     internal class UserValidator : IUserValidator
     {
-        public BaseResult ValidateOnNull(User entity)
-        {
-            if(entity == null)
-            {
-                return new BaseResult()
-                {
-                    ErrorCode = (int)ErrorCodes.UserNotFound,
-                    ErrorMessage = ErrorCodes.UserNotFound.ToString(),
-                };
-            }
-
-            return new BaseResult();
-        }
-
-        public BaseResult<User> ExistsValidation(User user, CreateUserDto dto)
+        public BaseResult<User> ValidateOnExists(User user, CreateUserDto dto)
         {
             if (user != null)
             {
@@ -58,49 +45,94 @@ namespace Application.Validation.UserValidations
             return new BaseResult<User>();
         }
 
-        public BaseResult<User> ExistsValidation(User user, UpdateUserDto dto)
+        public BaseResult<string> ValidateOnLoginExists(User user, string newLogin)
         {
             if (user != null)
             {
-                int errorCode = 0;
-                int count = 0;
-
-                if (user.Login == dto.Login)
+                if (user.Login == newLogin)
                 {
-                    errorCode = (int)ErrorCodes.UserWithTurnedLoginAlreadyExists;
-                    count++;
+                    return new BaseResult<string>()
+                    {
+                        ErrorCode = (int)ErrorCodes.UserWithTurnedLoginAlreadyExists,
+                        ErrorMessage = ErrorCodes.UserAlreadyExists.ToString()
+                    };
                 }
-                else if (user.Email == dto.Email)
+            }
+
+            return new BaseResult<string>();
+        }
+
+        public BaseResult<string> ValidateOnEmailExists(User user, string newEmail)
+        {
+            if (user != null)
+            {
+                if (user.Login == newEmail)
                 {
-                    errorCode = (int)ErrorCodes.UserWithTurnedEmailAlreadyExists;
-                    count++;
+                    return new BaseResult<string>()
+                    {
+                        ErrorCode = (int)ErrorCodes.UserWithTurnedEmailAlreadyExists,
+                        ErrorMessage = ErrorCodes.UserAlreadyExists.ToString()
+                    };
                 }
+            }
 
-                if (count == 2)
-                    errorCode = (int)ErrorCodes.UserWithTurnerdEmailAndLoginAlreadyExists;
+            return new BaseResult<string>();
+        }
 
-                return new BaseResult<User>()
+        public BaseResult<string> ValidateOnLoginRepeat(string oldLogin, string newLogin)
+        {
+            if (oldLogin == newLogin)
+            {
+                return new BaseResult<string>()
                 {
-                    ErrorCode = errorCode,
-                    ErrorMessage = ErrorCodes.UserAlreadyExists.ToString()
+                    ErrorCode = (int)ErrorCodes.TheOldLoginDoesNotMatchTheLogin,
+                    ErrorMessage = ErrorCodes.TheOldLoginDoesNotMatchTheLogin.ToString()
                 };
             }
 
-            return new BaseResult<User>();
+            return new BaseResult<string>();
         }
 
-        public BaseResult<User> PasswordValidation(string userPassword, string oldPassword)
+        public BaseResult<string> ValidateOnEmailRepeat(string oldEmail, string newEmail)
         {
-            if (userPassword != oldPassword)
+            if(oldEmail == newEmail)
             {
-                return new BaseResult<User>()
+                return new BaseResult<string>()
+                {
+                    ErrorCode = (int)ErrorCodes.TheOldEmailDoesNotMatchThePassword,
+                    ErrorMessage = ErrorCodes.TheOldEmailDoesNotMatchThePassword.ToString()
+                };
+            }
+
+            return new BaseResult<string>();
+        }
+
+        public BaseResult<string> ValidateOnPasswordRepeat(string userPassword, string oldPassword)
+        {
+            if (userPassword == oldPassword)
+            {
+                return new BaseResult<string>()
                 {
                     ErrorCode = (int)ErrorCodes.TheOldPasswordDoesNotMatchThePassword,
                     ErrorMessage = ErrorCodes.TheOldPasswordDoesNotMatchThePassword.ToString(),
                 };
             }
 
-            return new BaseResult<User>();
+            return new BaseResult<string>();
+        }
+
+        public BaseResult<decimal> ValidateOnCredit(decimal creditToAmount)
+        {
+            if(creditToAmount < 0)
+            {
+                return new BaseResult<decimal>()
+                {
+                    ErrorCode = (int)ErrorCodes.TheAmountToBeCreditedMustBeGreaterThanZero,
+                    ErrorMessage = ErrorCodes.TheAmountToBeCreditedMustBeGreaterThanZero.ToString()
+                };
+            }
+
+            return new BaseResult<decimal>();
         }
     }
 }

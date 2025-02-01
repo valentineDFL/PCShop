@@ -11,10 +11,13 @@ namespace DataAccessLayer.Mapping
 {
     internal class CartMapper
     {
+        private readonly UserMapper _userMapper;
         private readonly ProductMapper _productMapper;
 
-        public CartMapper(ProductMapper productMapper)
+
+        public CartMapper(UserMapper userMapper, ProductMapper productMapper)
         {
+            _userMapper = userMapper;
             _productMapper = productMapper;
         }
 
@@ -33,31 +36,31 @@ namespace DataAccessLayer.Mapping
             return cartEntity;
         }
 
-        public Cart EntityToModel(CartEntity cartEntity)
+        public async Task<Cart> EntityToModelAsync(CartEntity cartEntity)
         {
-            Console.WriteLine(cartEntity == null);
-
             Cart cart = new Cart
                     (
                         id: cartEntity.Id,
                         cartTotalPrice: cartEntity.CartTotalPrice,
                         cartTotalWeight: cartEntity.CartTotalWeight,
-                        user: null,
+                        user: _userMapper.EntityToModel(cartEntity.User),
                         userId: cartEntity.UserId,
-                        products: null
+                        products: await _productMapper.EntitiesToModelsAsync(cartEntity.Products)
                     );
 
             return cart;
         }
 
-        public async Task<List<CartEntity>> ModelsToEntitiesAsync()
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<List<Cart>> EntitiesToModelsAsync(List<CartEntity> entities)
         {
-            throw new NotImplementedException();
+            List<Cart> carts = new List<Cart>();
+
+            foreach (CartEntity entity in entities)
+            {
+                carts.Add(await EntityToModelAsync(entity));
+            }
+
+            return carts;
         }
     }
 }

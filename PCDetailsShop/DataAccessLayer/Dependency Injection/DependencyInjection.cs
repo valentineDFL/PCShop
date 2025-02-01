@@ -32,7 +32,7 @@ namespace DataAccessLayer.Dependency_Injection
             InitMapping(services);            
 
 
-            services.AddScoped<IRepository<User>, UserRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
 
             services.AddScoped<IRepository<Cart>, CartRepository>();
             //services.AddScoped<IRepository<Product>, ProductRepository>();

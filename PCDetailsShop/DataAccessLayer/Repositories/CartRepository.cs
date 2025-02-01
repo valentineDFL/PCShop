@@ -55,6 +55,8 @@ namespace DataAccessLayer.Repositories
         public async Task<BaseResult<Cart>> GetByIdAsync(Guid id)
         {
             CartEntity cart = await _dbContext.Carts
+                .Include(x => x.Products)
+                .ThenInclude(x => x.Categories)
                 .Include(x => x.User)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == id);
@@ -68,7 +70,7 @@ namespace DataAccessLayer.Repositories
                 };
             }
 
-            Cart result = _cartMapper.EntityToModel(cart);
+            Cart result = await _cartMapper.EntityToModelAsync(cart);
 
             return new BaseResult<Cart>() { Data = result };
         }

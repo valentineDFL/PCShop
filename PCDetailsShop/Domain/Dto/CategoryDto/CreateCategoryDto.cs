@@ -7,5 +7,5 @@ using Domain.Models;
 
 namespace Domain.Dto.CategoryDtos
 {
-    public record CreateCategoryDto(string Name, List<Product> Products);
+    public record CreateCategoryDto(string Name, List<Product> Products, List<Characteristic> Characteristics);
 }

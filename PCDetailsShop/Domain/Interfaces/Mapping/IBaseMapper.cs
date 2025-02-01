@@ -3,17 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Dto.UserDtos;
+using Domain.Result;
 
 namespace Domain.Interfaces.MappingW
 {
     public interface IBaseMapper<TModel, TDto>
     {
-        public TDto FromModelToDto(TModel model);
+        public BaseResult<TDto> FromModelToDto(TModel model);
 
-        public TModel FromDtoToModel(TDto dto);
-
-        public Task<List<TDto>> FromModelsToDtosAsync(List<TModel> models);
-
-        public Task<List<TModel>> FromDtosToModelsAsync(List<TDto> dtos);
+        public Task<CollectionResult<UserDto>> FromModelsToDtosAsync(List<TModel> models);
     }
 }

@@ -37,6 +37,21 @@ namespace DataAccessLayer.Migrations
                     b.ToTable("CartEntityProductEntity");
                 });
 
+            modelBuilder.Entity("CategoryEntityCharacteristicEntity", b =>
+                {
+                    b.Property<Guid>("CategoryEntityId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CharacteristicsId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("CategoryEntityId", "CharacteristicsId");
+
+                    b.HasIndex("CharacteristicsId");
+
+                    b.ToTable("CategoryEntityCharacteristicEntity");
+                });
+
             modelBuilder.Entity("CategoryEntityProductEntity", b =>
                 {
                     b.Property<Guid>("CategoriesId")
@@ -91,6 +106,27 @@ namespace DataAccessLayer.Migrations
                     b.HasAlternateKey("Name");
 
                     b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("DataAccessLayer.Entities.CharacteristicEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Characteristics");
                 });
 
             modelBuilder.Entity("DataAccessLayer.Entities.ProductEntity", b =>
@@ -173,6 +209,21 @@ namespace DataAccessLayer.Migrations
                     b.HasOne("DataAccessLayer.Entities.ProductEntity", null)
                         .WithMany()
                         .HasForeignKey("ProductsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("CategoryEntityCharacteristicEntity", b =>
+                {
+                    b.HasOne("DataAccessLayer.Entities.CategoryEntity", null)
+                        .WithMany()
+                        .HasForeignKey("CategoryEntityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DataAccessLayer.Entities.CharacteristicEntity", null)
+                        .WithMany()
+                        .HasForeignKey("CharacteristicsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

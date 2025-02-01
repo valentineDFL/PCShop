@@ -1,6 +1,104 @@
 [
   {
     "ContainingType": "PCDetailsShop.API.Controllers.UserController",
+    "Method": "ChangeUserEmailByIdAsync",
+    "RelativePath": "User/ChangeUserEmailById",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Guid",
+        "IsRequired": false
+      },
+      {
+        "Name": "newEmail",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.BaseResult\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.UserController",
+    "Method": "ChangeUserLoginByIdAsync",
+    "RelativePath": "User/ChangeUserLoginById",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Guid",
+        "IsRequired": false
+      },
+      {
+        "Name": "newLogin",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.BaseResult\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.UserController",
+    "Method": "ChangeUserPasswordByIdAsync",
+    "RelativePath": "User/ChangeUserPasswordById",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Guid",
+        "IsRequired": false
+      },
+      {
+        "Name": "oldPassword",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "newPassword",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.BaseResult\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.UserController",
     "Method": "CreateUserAsync",
     "RelativePath": "User/CreateUser",
     "HttpMethod": "POST",
@@ -53,6 +151,26 @@
   },
   {
     "ContainingType": "PCDetailsShop.API.Controllers.UserController",
+    "Method": "GetAllUsersAsync",
+    "RelativePath": "User/GetAllUsers",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.CollectionResult\u00601[[Domain.Dto.UserDtos.UserDto, Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.UserController",
     "Method": "GetUserById",
     "RelativePath": "User/GetUserById",
     "HttpMethod": "GET",
@@ -67,7 +185,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "Domain.Dto.UserDtos.UserDto",
+        "Type": "Domain.Result.BaseResult\u00601[[Domain.Dto.UserDtos.UserDto, Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -79,21 +197,52 @@
   },
   {
     "ContainingType": "PCDetailsShop.API.Controllers.UserController",
-    "Method": "UpdateUser",
-    "RelativePath": "User/UpdateUserById",
+    "Method": "GetUserByNameAsync",
+    "RelativePath": "User/GetUserByName",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "name",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.CollectionResult\u00601[[Domain.Dto.UserDtos.UserDto, Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.UserController",
+    "Method": "IncreaseWalletBalance",
+    "RelativePath": "User/IncreaseWalletBalance",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "dto",
-        "Type": "Domain.Dto.UserDtos.UpdateUserDto",
-        "IsRequired": true
+        "Name": "userId",
+        "Type": "System.Guid",
+        "IsRequired": false
+      },
+      {
+        "Name": "increaseSumm",
+        "Type": "System.Decimal",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "Domain.Dto.UserDtos.UserDto",
+        "Type": "Domain.Result.BaseResult\u00601[[System.Decimal, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "text/plain",
           "application/json",

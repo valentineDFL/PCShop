@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace Domain.Dto.CategoryDtos
 {
-    public record UpdateCategoryDto(string Name);
+    public record UpdateCategoryDto(Guid id, string Name);
 }

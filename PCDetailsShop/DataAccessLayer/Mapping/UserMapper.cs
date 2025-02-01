@@ -30,7 +30,7 @@ namespace DataAccessLayer.Mapping
             return userEntity;
         }
 
-        public async Task<User> EntityToModelAsync(UserEntity userEntity)
+        public User EntityToModel(UserEntity userEntity)
         {
             User user = new User
                     (
@@ -52,10 +52,13 @@ namespace DataAccessLayer.Mapping
         {
             List<User> users = new List<User>();
 
-            foreach (UserEntity entity in userEntities)
+            await Task.Run(() =>
             {
-                users.Add(await EntityToModelAsync(entity));
-            }            
+                foreach (UserEntity entity in userEntities)
+                {
+                    users.Add(EntityToModel(entity));
+                }            
+            });
 
             return users;
         }

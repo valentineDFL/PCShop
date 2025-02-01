@@ -19,7 +19,7 @@ namespace Application.Services
 {
     public class UserService : IUserService
     {
-        private readonly IRepository<User> _userRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IRepository<Cart> _cartRepository;
 
         private readonly ILogger _logger;
@@ -27,7 +27,7 @@ namespace Application.Services
 
         private readonly IEncrypter _passwordEncrypter;
 
-        public UserService(IRepository<User> userRepository, IRepository<Cart> cartRepository, ILogger logger, IUserValidator userValidator, IEncrypter passwordEncrypter)
+        public UserService(IUserRepository userRepository, IRepository<Cart> cartRepository, ILogger logger, IUserValidator userValidator, IEncrypter passwordEncrypter)
         {
             _userRepository = userRepository;
             _cartRepository = cartRepository;
@@ -41,6 +41,26 @@ namespace Application.Services
             try
             {
                 BaseResult<User> user = await _userRepository.GetByIdAsync(id);
+
+                return user;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, ex.Message);
+
+                return new BaseResult<User>()
+                {
+                    ErrorCode = (int)ErrorCodes.InternalServerError,
+                    ErrorMessage = ErrorCodes.InternalServerError.ToString(),
+                };
+            }
+        }
+
+        public async Task<BaseResult<User>> GetUserByNameAsync(string name)
+        {
+            try
+            {
+                BaseResult<User> user = await _userRepository.GetByLoginAsync(name);
 
                 return user;
             }
@@ -85,7 +105,7 @@ namespace Application.Services
                 if (users.IsSuccess)
                 {
                     User findedUser = users.Data.FirstOrDefault(u => u.Login == dto.Login || u.Email == dto.Email);
-                    BaseResult<User> existsValidationResult = _userValidator.ExistsValidation(findedUser, dto);
+                    BaseResult<User> existsValidationResult = _userValidator.ValidateOnExists(findedUser, dto);
 
                     if (!existsValidationResult.IsSuccess)
                     return existsValidationResult;
@@ -141,63 +161,162 @@ namespace Application.Services
             }
         }
 
-        public async Task<BaseResult<User>> UpdateUserAsync(UpdateUserDto dto)
+        public async Task<BaseResult<string>> ChangeUserLoginAsync(Guid id, string newLogin)
         {
             try
             {
-                if(dto.summForAdd < 0)
+                BaseResult<User> user = await _userRepository.GetByIdAsync(id);
+
+                if (user.IsSuccess)
                 {
-                    return new BaseResult<User>()
+                    return new BaseResult<string>()
                     {
-                        ErrorCode = (int)ErrorCodes.TheAmountToBeCreditedMustBeGreaterThanZero,
-                        ErrorMessage = ErrorCodes.TheAmountToBeCreditedMustBeGreaterThanZero.ToString(),
+                        ErrorCode = user.ErrorCode,
+                        ErrorMessage = user.ErrorMessage,
                     };
                 }
 
-                BaseResult<User> userForUpdate = await _userRepository.GetByIdAsync(dto.Id);
+                BaseResult<string> loginRepeatValidationResult = _userValidator.ValidateOnLoginRepeat(user.Data.Login, newLogin);
+                
+                if(!loginRepeatValidationResult.IsSuccess)
+                    return loginRepeatValidationResult;
 
-                if (!userForUpdate.IsSuccess)
-                    return userForUpdate;
+                BaseResult<User> userWithTurnedLogin = await _userRepository.GetByLoginAsync(newLogin);
 
-                User user = _userRepository.GetAllAsync()
-                    .Result
-                    .Data
-                    .FirstOrDefault(u => u.Login == dto.Login || u.Email == dto.Email);
+                BaseResult<string> loginExistsValidationResult = _userValidator.ValidateOnLoginExists(userWithTurnedLogin.Data, newLogin);
 
-                BaseResult<User> existValidateResult = _userValidator.ExistsValidation(user, dto);
+                if(!loginExistsValidationResult.IsSuccess)
+                    return loginExistsValidationResult;
 
-                if(!existValidateResult.IsSuccess)
-                    return existValidateResult;
+                return await _userRepository.ChangeLoginAsync(id, newLogin);
 
-                string oldPassword = _passwordEncrypter.Encrypt(dto.OldPassword);
-                BaseResult<User> passwordValidationResult = _userValidator.PasswordValidation(userForUpdate.Data.Password, oldPassword);
-
-                if (!passwordValidationResult.IsSuccess)
-                    return passwordValidationResult;
-
-                return await UpdateUser(dto);
             }
             catch (Exception ex)
             {
                 _logger.Error(ex, ex.Message);
 
-                return new BaseResult<User>()
+                return new BaseResult<string>()
                 {
                     ErrorCode = (int)ErrorCodes.InternalServerError,
-                    ErrorMessage = ErrorCodes.InternalServerError.ToString()
+                    ErrorMessage = ErrorCodes.InternalServerError.ToString(),
                 };
             }
         }
 
-        private async Task<BaseResult<User>> UpdateUser(UpdateUserDto dto)
+        public async Task<BaseResult<string>> ChangeUserEmailAsync(Guid id, string newEmail)
         {
-            string newPassword = _passwordEncrypter.Encrypt(dto.NewPassword);
+            try
+            {
+                BaseResult<User> user = await _userRepository.GetByIdAsync(id);
 
-            User updateData = new User(dto.Id, dto.Login, dto.Email, newPassword, dto.summForAdd, DateTime.MinValue, DateTime.MinValue, null, Guid.Empty);
+                if (!user.IsSuccess)
+                {
+                    return new BaseResult<string>()
+                    {
+                        ErrorCode = user.ErrorCode,
+                        ErrorMessage = user.ErrorMessage,
+                    };
+                }
 
-            BaseResult<User> updateResult = await _userRepository.UpdateAsync(updateData);
+                BaseResult<string> emailRepeatValidationResult = _userValidator.ValidateOnEmailRepeat(user.Data.Email, newEmail);
 
-            return updateResult;
+                if (!emailRepeatValidationResult.IsSuccess)
+                    return emailRepeatValidationResult;
+
+                CollectionResult<User> users = await _userRepository.GetAllAsync();
+
+                User userWithTurnedEmail = users.Data.FirstOrDefault(u => u.Email == newEmail);
+
+                BaseResult<string> emailExistsValidationResult = _userValidator.ValidateOnEmailExists(userWithTurnedEmail, newEmail);
+
+                if(!emailExistsValidationResult.IsSuccess)
+                    return emailExistsValidationResult;
+
+                return await _userRepository.ChangeEmailAsync(id, newEmail);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, ex.Message);
+
+                return new BaseResult<string>()
+                {
+                    ErrorCode = (int)ErrorCodes.InternalServerError,
+                    ErrorMessage = ErrorCodes.InternalServerError.ToString(),
+                };
+            }
+        }
+
+        public async Task<BaseResult<string>> ChangeUserPasswordAsync(Guid id, string oldPassword, string newPassword)
+        {
+            try
+            {
+                BaseResult<User> user = await _userRepository.GetByIdAsync(id);
+
+                if (!user.IsSuccess)
+                {
+                    return new BaseResult<string>()
+                    {
+                        ErrorCode = user.ErrorCode,
+                        ErrorMessage = user.ErrorMessage,
+                    };
+                }
+
+                string userPassword = user.Data.Password;
+
+                oldPassword = _passwordEncrypter.Encrypt(oldPassword);
+                newPassword = _passwordEncrypter.Encrypt(newPassword);
+
+                BaseResult<string> passwordRepeatValidationResult = _userValidator.ValidateOnPasswordRepeat(userPassword, newPassword);
+
+                if (!passwordRepeatValidationResult.IsSuccess)
+                    return passwordRepeatValidationResult;
+
+                return await _userRepository.ChangePasswordAsync(id, newPassword);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, ex.Message);
+
+                return new BaseResult<string>()
+                {
+                    ErrorCode = (int)ErrorCodes.InternalServerError,
+                    ErrorMessage = ErrorCodes.InternalServerError.ToString(),
+                };
+            }
+        }
+
+        public async Task<BaseResult<decimal>> AddMoneyToBalanceAsync(Guid id, decimal increaseSumm)
+        {
+            try
+            {
+                BaseResult<decimal> creditValidationResult = _userValidator.ValidateOnCredit(increaseSumm);
+
+                if (!creditValidationResult.IsSuccess)
+                    return creditValidationResult;
+
+                BaseResult<User> user = await _userRepository.GetByIdAsync(id);
+
+                if (!user.IsSuccess)
+                {
+                    return new BaseResult<decimal>()
+                    {
+                        ErrorCode = user.ErrorCode,
+                        ErrorMessage = user.ErrorMessage,
+                    };
+                }
+
+                return await _userRepository.AddMoneyToBalance(id, increaseSumm);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, ex.Message);
+
+                return new BaseResult<decimal>()
+                {
+                    ErrorCode = (int)ErrorCodes.InternalServerError,
+                    ErrorMessage = ErrorCodes.InternalServerError.ToString(),
+                };
+            }
         }
     }
 }
