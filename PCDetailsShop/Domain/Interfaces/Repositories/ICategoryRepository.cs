@@ -11,16 +11,22 @@ namespace Domain.Interfaces.Repositories
 {
     public interface ICategoryRepository
     {
-        public Task<CollectionResult<Category>> GetAllAsync();
+        public Task<List<Category>> GetAllAsync();
         
-        public Task<BaseResult<Category>> GetByIdAsync(Guid id);
+        public Task<Category> GetByIdAsync(Guid id);
 
-        public Task<BaseResult<Category>> GetByNameAsync(string partName);
+        public Task<Category> GetByNameAsync(string partName);
 
-        public Task<BaseResult<Category>> CreateAsync(Category category);
+        public Task<List<Category>> GetByNamePartAsync(string namePart);
 
-        public Task<BaseResult<Category>> UpdateAsync(Category category);
+        public Task<Category> CreateAsync(Category category);
 
-        public Task<BaseResult<Guid>> DeleteAsync(Guid id);
+        public Task<int> ChangeNameAsync(Guid id, string newName);
+
+        public Task<int> AddProductsToCategoryAsync(Guid categoryId, List<Guid> productsId);
+
+        public Task<int> RemoveProductsFromCategoryAsync(Guid categoryId, List<Guid> productsId);
+
+        public Task<int> DeleteByIdAsync(Guid id);
     }
 }

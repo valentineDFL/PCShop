@@ -5,6 +5,7 @@ using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using DataAccessLayer.Entities;
 using DataAccessLayer.Mapping;
 using Domain.Enums;
@@ -26,71 +27,56 @@ namespace DataAccessLayer.Repositories
             _categoryMapper = categoryMapper;
         }
 
-        public async Task<CollectionResult<Category>> GetAllAsync()
+        public async Task<List<Category>> GetAllAsync()
         {
             List<CategoryEntity> categoties = await _dbContext.Categories
                 .Include(c => c.Products)
+                .Include(c => c.CharacteristicPatterns)
                 .ToListAsync();
 
-            if(categoties.Count == 0)
-            {
-                return new CollectionResult<Category>()
-                {
-                    ErrorCode = (int)ErrorCodes.CategoriesNotFound,
-                    ErrorMessage = ErrorCodes.CategoriesNotFound.ToString()
-                };
-            }
-
-            List<Category> result = await _categoryMapper.EntitiesToModelsAsync(categoties);
+            List<Category> mappedCategories = await _categoryMapper.EntitiesToModelsAsync(categoties);
             
-            return new CollectionResult<Category>()
-            {
-                Count = result.Count,
-                Data = result
-            };
+            return mappedCategories;
         }
 
-        public async Task<BaseResult<Category>> GetByIdAsync(Guid id)
+        public async Task<Category> GetByIdAsync(Guid id)
         {
             CategoryEntity categoryEntity = await _dbContext.Categories
                 .Include(c => c.Products)
+                .Include(c => c.CharacteristicPatterns)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
-            if(categoryEntity == null)
-            {
-                return new BaseResult<Category>()
-                {
-                    ErrorCode = (int)ErrorCodes.CategoryNotFound,
-                    ErrorMessage= ErrorCodes.CategoryNotFound.ToString()
-                };
-            }
+            Category mappedCategory = _categoryMapper.EntityToModel(categoryEntity);
 
-            Category category = _categoryMapper.EntityToModel(categoryEntity);
-
-            return new BaseResult<Category>() { Data = category };
+            return mappedCategory;
         }
 
-        public async Task<BaseResult<Category>> GetByNameAsync(string partName)
+        public async Task<Category> GetByNameAsync(string name)
         {
             CategoryEntity categoryEntity = await _dbContext.Categories
                 .Include(c => c.Products)
-                .FirstOrDefaultAsync(c => c.Name.Contains(partName));
+                .Include(c => c.CharacteristicPatterns)
+                .FirstOrDefaultAsync(c => c.Name == name);
 
-            if (categoryEntity == null)
-            {
-                return new BaseResult<Category>()
-                {
-                    ErrorCode = (int)ErrorCodes.CategoryNotFound,
-                    ErrorMessage = ErrorCodes.CategoryNotFound.ToString()
-                };
-            }
+            Category mappedCategory = _categoryMapper.EntityToModel(categoryEntity);
 
-            Category category = _categoryMapper.EntityToModel(categoryEntity);
-
-            return new BaseResult<Category>() { Data = category };
+            return mappedCategory;
         }
 
-        public async Task<BaseResult<Category>> CreateAsync(Category category)
+        public async Task<List<Category>> GetByNamePartAsync(string namePart)
+        {
+            List<CategoryEntity> categoryEntities = await _dbContext.Categories
+                .Include(c => c.Products)
+                .Include(c => c.CharacteristicPatterns)
+                .Where(c => c.Name.Contains(namePart)
+                ).ToListAsync();
+
+            List<Category> mappedCategory = await _categoryMapper.EntitiesToModelsAsync(categoryEntities);
+
+            return mappedCategory;
+        }
+
+        public async Task<Category> CreateAsync(Category category)
         {
             if (category == null)
                 throw new ArgumentNullException($"Categoty null {nameof(CreateAsync)}");
@@ -100,13 +86,15 @@ namespace DataAccessLayer.Repositories
             await _dbContext.AddAsync(entity);
             await _dbContext.SaveChangesAsync();
 
-            return new BaseResult<Category>() { Data = category };
+            Category mappedCategory = _categoryMapper.EntityToModel(entity);
+
+            return mappedCategory;
         }
 
-        public async Task<BaseResult<Guid>> DeleteAsync(Guid id)
+        public async Task<int> DeleteByIdAsync(Guid id)
         {
             if (id == Guid.Empty)
-                throw new ArgumentException($"Category id is Empty {nameof(DeleteAsync)}");
+                throw new ArgumentException($"Category id is Empty {nameof(DeleteByIdAsync)}");
 
             int deletedCategories = await _dbContext.Categories
                 .Where(cat => cat.Id == id)
@@ -114,43 +102,97 @@ namespace DataAccessLayer.Repositories
 
             await _dbContext.SaveChangesAsync();
 
-            if (deletedCategories == 0)
-            {
-                return new BaseResult<Guid>()
-                {
-                    ErrorCode = (int)ErrorCodes.CategoryNotFound,
-                    ErrorMessage = ErrorCodes.CategoryNotFound.ToString()
-                };
-            }
-
-            return new BaseResult<Guid>() { Data = id };
+            return deletedCategories;
         }
 
-        public async Task<BaseResult<Category>> UpdateAsync(Category category)
+        public async Task<int> ChangeNameAsync(Guid id, string newName)
         {
-            if (category == null)
-                throw new ArgumentNullException($"Categoty null {nameof(UpdateAsync)}");
+            if (string.IsNullOrEmpty(newName))
+                throw new ArgumentNullException($"NewCategoryName null or empty {nameof(ChangeNameAsync)}");
 
-            CategoryEntity entity = _categoryMapper.ModelToEntity(category);
-
-            int updatedCategoriesCount = await _dbContext.Categories
-                .Where(c => c.Id == entity.Id)
+            int updatedCategories = await _dbContext.Categories
+                .Where(cat => cat.Id == id)
                 .ExecuteUpdateAsync(c => c
-                .SetProperty(p => p.Name, entity.Name)
-                .SetProperty(p => p.Products, entity.Products));
+                .SetProperty(c => c.Name, newName));
 
-            if(updatedCategoriesCount == 0)
+            await _dbContext.SaveChangesAsync();
+
+            return updatedCategories;
+        }
+
+        public async Task<int> AddProductsToCategoryAsync(Guid categoryId, List<Guid> productsId)
+        {
+            CategoryEntity category = await _dbContext.Categories
+                .FirstOrDefaultAsync(c => c.Id == categoryId);
+
+            if(category == null)
+                return 0;
+
+            List<ProductEntity> productsToAdd = await _dbContext.Products
+                .Where(prod => productsId.Contains(prod.Id))
+                .ToListAsync();
+
+            if(productsToAdd.Count == 0)
+                return 0;
+
+            List<ProductEntity> categoryProducts = GetAddedProducts(category, productsToAdd);
+
+            int updatedCategories = await _dbContext.Categories
+                .Where(cat => cat.Id == categoryId)
+                .ExecuteUpdateAsync(c => c
+                .SetProperty(c => c.Products, categoryProducts));
+
+            await _dbContext.SaveChangesAsync();
+
+            return updatedCategories;
+        }
+
+        private List<ProductEntity> GetAddedProducts(CategoryEntity category, List<ProductEntity> productsToAdd)
+        {
+            List<ProductEntity> categoryProducts = category.Products;
+
+            foreach (ProductEntity productToAdd in productsToAdd)
             {
-                return new BaseResult<Category>()
-                {
-                    ErrorCode = (int)ErrorCodes.CategoryNotFound,
-                    ErrorMessage = ErrorCodes.CategoryNotFound.ToString()
-                };
+                if (categoryProducts.Contains(productToAdd))
+                    productsToAdd.Remove(productToAdd);
             }
 
-            await _dbContext.AddAsync(entity);
+            categoryProducts.AddRange(productsToAdd);
 
-            return new BaseResult<Category>() { Data = category };
+            return categoryProducts;
+        }
+
+        public async Task<int> RemoveProductsFromCategoryAsync(Guid categoryId, List<Guid> productsId)
+        {
+            CategoryEntity category = await _dbContext.Categories
+                .FirstOrDefaultAsync(c => c.Id == categoryId);
+
+            if (category == null)
+                return 0;
+
+            List<ProductEntity> productsToRemove = await _dbContext.Products
+                .Where(prod => productsId.Contains(prod.Id))
+                .ToListAsync();
+
+            if (productsToRemove.Count == 0)
+                return 0;
+
+            List<ProductEntity> categoryProducts = category.Products;
+
+            foreach (ProductEntity productToRemove in productsToRemove)
+            {
+                if (categoryProducts.Contains(productToRemove))
+                    categoryProducts.Remove(productToRemove);
+            }
+
+            int updatedCategories = await _dbContext.Categories
+                .Where(cat => cat.Id == categoryId)
+                .ExecuteUpdateAsync(c => c
+                .SetProperty(c => c.Products, categoryProducts));
+
+            await _dbContext.SaveChangesAsync();
+
+            return updatedCategories;
         }
     }
 }

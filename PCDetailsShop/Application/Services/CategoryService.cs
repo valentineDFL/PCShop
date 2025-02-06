@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
-using Domain.Dto.CategoryDtos;
+﻿using Domain.Dto.CategoryDtos;
+using Domain.Dto.ProductDtos;
 using Domain.Enums;
 using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
@@ -18,296 +13,253 @@ namespace Application.Services
     internal class CategoryService : ICategoryService
     {
         private readonly ICategoryRepository _categoryRepository;
-        private readonly IRepository<Product> _productRepository;
+        private readonly IProductRepository _productRepository;
+        private readonly ICharacteristicPatternRepository _characteristicPatternRepository;
 
         private readonly ICategoryValidator _categoryValidator;
 
         private readonly ILogger _logger;
 
-        public CategoryService(ICategoryRepository categoryRepository, IRepository<Product> productRepository, ICategoryValidator categoryValidator, ILogger logger)
+        public CategoryService(ICategoryRepository categoryRepository, IProductRepository productRepository, ICharacteristicPatternRepository characteristicPatternRepository, ICategoryValidator categoryValidator, ILogger logger)
         {
             _categoryRepository = categoryRepository;
             _productRepository = productRepository;
+            _characteristicPatternRepository = characteristicPatternRepository;
             _categoryValidator = categoryValidator;
             _logger = logger;
         }
 
         public async Task<CollectionResult<Category>> GetAllAsync()
         {
-            try
+            List<Category> categories = await _categoryRepository.GetAllAsync();
+
+            if(categories.Count == 0)
             {
-                CollectionResult<Category> categories = await _categoryRepository.GetAllAsync();
-                
-                return categories;
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, ex.Message);
+                _logger.Warning(ErrorCodes.CategoriesNotFound.ToString());
 
                 return new CollectionResult<Category>()
                 {
-                    ErrorCode = (int)ErrorCodes.InternalServerError,
-                    ErrorMessage = ErrorCodes.InternalServerError.ToString(),
+                    ErrorCode = (int)ErrorCodes.CategoriesNotFound,
+                    ErrorMessage = ErrorCodes.CategoryNotFound.ToString(),
                 };
             }
+
+            return new CollectionResult<Category>() { Data = categories };
         }
 
         public async Task<BaseResult<Category>> GetByIdAsync(Guid categoryId)
         {
-            try
-            {
-                BaseResult<Category> category = await _categoryRepository.GetByIdAsync(categoryId);
+            Category category = await _categoryRepository.GetByIdAsync(categoryId);
 
-                return category;
-            }
-            catch (Exception ex)
+            if(category == null)
             {
-                _logger.Error(ex, ex.Message);
-
                 return new BaseResult<Category>()
                 {
-                    ErrorCode = (int)ErrorCodes.InternalServerError,
-                    ErrorMessage = ErrorCodes.InternalServerError.ToString(),
+                    ErrorCode = (int)ErrorCodes.CategoryNotFound,
+                    ErrorMessage = ErrorCodes.CategoryNotFound.ToString(),
                 };
             }
+
+            return new BaseResult<Category>() { Data = category };
         }
 
-        public async Task<CollectionResult<Product>> GetAllCategoryProducts(string categoryNamePart)
+        public async Task<CollectionResult<Category>> GetByNamePartAsync(string namePart)
         {
-            try
-            {
-                BaseResult<Category> category = await _categoryRepository.GetByNameAsync(categoryNamePart);
+            List<Category> categories = await _categoryRepository.GetByNamePartAsync(namePart);
 
-                if (!category.IsSuccess)
+            if (categories.Count == 0)
+            {
+                return new CollectionResult<Category>()
                 {
-                    return new CollectionResult<Product>()
-                    {
-                        ErrorCode = category.ErrorCode,
-                        ErrorMessage = category.ErrorMessage,
-                    };
-                }
+                    ErrorCode = (int)ErrorCodes.CategoriesNotFound,
+                    ErrorMessage = ErrorCodes.CategoriesNotFound.ToString(),
+                };
+            }
+
+            return new CollectionResult<Category>() { Data = categories };
+        }
+
+        public async Task<BaseResult<Category>> GetByNameAsync(string name)
+        {
+            Category category = await _categoryRepository.GetByNameAsync(name);
+
+            if (category == null)
+            {
+                return new BaseResult<Category>()
+                {
+                    ErrorCode = (int)ErrorCodes.CategoryNotFound,
+                    ErrorMessage = ErrorCodes.CategoryNotFound.ToString(),
+                };
+            }
+
+            return new BaseResult<Category>() { Data = category };
+        }
+
+        public async Task<CollectionResult<Product>> GetAllCategoryProductsById(Guid categoryId)
+        {
+            Category category = await _categoryRepository.GetByIdAsync(categoryId);
+
+            if(category == null)
+            {
+                return new CollectionResult<Product>()
+                {
+                    ErrorCode = (int)ErrorCodes.CategoryNotFound,
+                    ErrorMessage = ErrorCodes.CategoryNotFound.ToString(),
+                };
+            }
+
+            if(category.Products.Count == 0)
+            {
+                return new CollectionResult<Product>()
+                {
+                    ErrorCode = (int)ErrorCodes.ProductsNotFound,
+                    ErrorMessage = ErrorCodes.ProductsNotFound.ToString(),
+                };
+            }
+
+            return new CollectionResult<Product>() {Count = category.Products.Count, Data = category.Products };
+        }
+
+        public async Task<CollectionResult<Product>> GetAllCategoryProductsByName(string name)
+        {
+            Category category = await _categoryRepository.GetByNameAsync(name);
+
+            if (category == null)
+            {
+                return new CollectionResult<Product>()
+                {
+                    ErrorCode = (int)ErrorCodes.CategoryNotFound,
+                    ErrorMessage = ErrorCodes.CategoryNotFound.ToString(),
+                };
+            }
+
+            if (category.Products.Count == 0)
+            {
+                _logger.Warning(ErrorCodes.ProductsNotFound.ToString());
 
                 return new CollectionResult<Product>()
                 {
-                    Count = category.Data.Products.Count,
-                    Data = category.Data.Products
+                    ErrorCode = (int)ErrorCodes.ProductsNotFound,
+                    ErrorMessage = ErrorCodes.ProductsNotFound.ToString(),
                 };
             }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, ex.Message);
 
-                return new CollectionResult<Product>()
-                {
-                    ErrorCode = (int)ErrorCodes.InternalServerError,
-                    ErrorMessage= ErrorCodes.InternalServerError.ToString(),
-                };
-            }
+            return new CollectionResult<Product>() { Count = category.Products.Count, Data = category.Products };
         }
 
-        public async Task<BaseResult<Category>> GetByNamePartAsync(string namePart)
+        public Task<BaseResult<Category>> CreateAsync(CreateCategoryDto dto)
         {
-            try
-            {
-                BaseResult<Category> category = await _categoryRepository.GetByNameAsync(namePart);
-
-                return category;
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, ex.Message);
-
-                return new BaseResult<Category>()
-                {
-                    ErrorCode = (int)ErrorCodes.InternalServerError,
-                    ErrorMessage = ErrorCodes.InternalServerError.ToString(),
-                };
-            }
-        }
-
-        public async Task<BaseResult<Category>> CreateAsync(CreateCategoryDto dto)
-        {
-            try
-            {
-                BaseResult<Category> category = await _categoryRepository.GetByNameAsync(dto.Name);
-
-                BaseResult<Category> categoryExistsValidationResult = _categoryValidator.ValidateOnNameExists(category.Data);
-
-                if (!categoryExistsValidationResult.IsSuccess)
-                    return categoryExistsValidationResult;
-
-                Guid categoryId = Guid.NewGuid();
-
-                Category categoryToCreate = new Category(categoryId, dto.Name, dto.Products, dto.Characteristics);
-
-                BaseResult<Category> createdCategory = await _categoryRepository.CreateAsync(categoryToCreate);
-
-                return createdCategory;
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, ex.Message);
-
-                return new BaseResult<Category>()
-                {
-                    ErrorCode = (int)ErrorCodes.InternalServerError,
-                    ErrorMessage = ErrorCodes.InternalServerError.ToString(),
-                };
-            }
+            throw new NotImplementedException();
         }
 
         public async Task<BaseResult<Guid>> DeleteByIdAsync(Guid categoryId)
         {
-            try
-            {
-                BaseResult<Guid> category = await _categoryRepository.DeleteAsync(categoryId);
+            int deletedCategoriesCount = await _categoryRepository.DeleteByIdAsync(categoryId);
 
-                return category;
-            }
-            catch (Exception ex)
+            if(deletedCategoriesCount == 0)
             {
-                _logger.Error(ex, ex.Message);
-
                 return new BaseResult<Guid>()
                 {
-                    ErrorCode = (int)ErrorCodes.InternalServerError,
-                    ErrorMessage = ErrorCodes.InternalServerError.ToString(),
+                    ErrorCode = (int)ErrorCodes.CategoryNotFound,
+                    ErrorMessage = ErrorCodes.CategoryNotFound.ToString(),
                 };
             }
+
+            return new BaseResult<Guid>() { Data = categoryId };
         }
 
         public async Task<BaseResult<Category>> ChangeNameAsync(Guid categoryId, string newName)
         {
-            try
+            Category category = await _categoryRepository.GetByIdAsync(categoryId);
+
+            if (category == null)
             {
-                BaseResult<Category> category = await _categoryRepository.GetByIdAsync(categoryId);
-
-                if (!category.IsSuccess)
-                    return category;
-
-                BaseResult<Category> categoryWithTurnedNewName = await _categoryRepository.GetByNameAsync(newName);
-
-                BaseResult<Category> categoryNameExistsValidationResult = _categoryValidator.ValidateOnNameExists(categoryWithTurnedNewName.Data);
-
-                if (!categoryNameExistsValidationResult.IsSuccess)
-                    return categoryNameExistsValidationResult;
-
-                Category updatedCategory = new Category(category.Data.Id, newName, category.Data.Products, category.Data.Characteristics);
-
-                return await _categoryRepository.UpdateAsync(updatedCategory);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, ex.Message);
-
                 return new BaseResult<Category>()
                 {
-                    ErrorCode = (int)ErrorCodes.InternalServerError,
-                    ErrorMessage = ErrorCodes.InternalServerError.ToString(),
+                    ErrorCode = (int)ErrorCodes.CategoryNotFound,
+                    ErrorMessage = ErrorCodes.CategoryNotFound.ToString(),
                 };
             }
+
+            Category categoryWithTurnedNewName = await _categoryRepository.GetByNameAsync(newName);
+
+            BaseResult<Category> categoryNewNameExistsValidationResult = _categoryValidator.ValidateOnNameExists(categoryWithTurnedNewName);
+
+            if (!categoryNewNameExistsValidationResult.IsSuccess)
+                return categoryNewNameExistsValidationResult;
+
+            await _categoryRepository.ChangeNameAsync(categoryId, newName);
+
+            return new BaseResult<Category>() { Data = category };
         }
 
-        public async Task<BaseResult<Product>> AddProductToCategoryAsync(string categoryName, Guid productId)
+
+
+        public async Task<CollectionResult<Product>> AddProductsToCategoryAsync(Guid categoryId, List<Guid> productsId)
         {
-            try
+            Category category = await _categoryRepository.GetByIdAsync(categoryId);
+
+            if (category == null)
             {
-                BaseResult<Category> category = await _categoryRepository.GetByNameAsync(categoryName);
-
-                if (!category.IsSuccess)
+                return new CollectionResult<Product>()
                 {
-                    return new BaseResult<Product>()
-                    {
-                        ErrorCode = category.ErrorCode,
-                        ErrorMessage = category.ErrorMessage,
-                    };
-                }
-
-                BaseResult<Product> productToAdd = await _productRepository.GetByIdAsync(productId);
-
-                if (!productToAdd.IsSuccess)
-                    return productToAdd;
-
-                BaseResult<Product> validateOnProductRepeatResult = _categoryValidator.ValidateOnProductRepeat(category.Data, productToAdd.Data);
-
-                if (!validateOnProductRepeatResult.IsSuccess)
-                    return validateOnProductRepeatResult;
-
-                return await AddProductToCategoryAsync(category, productToAdd);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, ex.Message);
-
-                return new BaseResult<Product>()
-                {
-                    ErrorCode = (int)ErrorCodes.InternalServerError,
-                    ErrorMessage = ErrorCodes.InternalServerError.ToString(),
+                    ErrorCode = (int)ErrorCodes.CategoryNotFound,
+                    ErrorMessage = ErrorCodes.CategoryNotFound.ToString(),
                 };
             }
+
+            int updatedCategories = await _categoryRepository.AddProductsToCategoryAsync(categoryId, productsId);
+
+            
+
+            throw new NotImplementedException();
         }
 
-        private async Task<BaseResult<Product>> AddProductToCategoryAsync(BaseResult<Category> category, BaseResult<Product> productToAdd)
+        public Task<CollectionResult<Product>> DeleteProductsFromCategoryAsync(Guid categoryId, List<Guid> productsId)
         {
-            List<Product> products = category.Data.Products.ToList();
-            products.Add(productToAdd.Data);
-
-            Category updatedCategory = new Category(category.Data.Id, category.Data.Name, products, category.Data.Characteristics);
-
-            BaseResult<Category> updateResult = await _categoryRepository.UpdateAsync(updatedCategory);
-
-            return productToAdd;
+            throw new NotImplementedException();
         }
 
-        public async Task<BaseResult<Product>> DeleteProductFromCategoryAsync(string categoryNamePart, Guid productId)
+        public async Task<CollectionResult<CharacteristicPattern>> GetCharacteristicsByCategoryIdAsync(Guid categoryId)
         {
-            try
+            Category category = await _categoryRepository.GetByIdAsync(categoryId);
+
+            if(category == null)
             {
-                BaseResult<Category> category = await _categoryRepository.GetByNameAsync(categoryNamePart);
-
-                if (!category.IsSuccess)
+                return new CollectionResult<CharacteristicPattern>()
                 {
-                    return new BaseResult<Product>()
-                    {
-                        ErrorCode = category.ErrorCode,
-                        ErrorMessage = category.ErrorMessage,
-                    };
-                }
-
-                BaseResult<Product> productToRemoveResult = await _productRepository.GetByIdAsync(productId);
-
-                if(!productToRemoveResult.IsSuccess)
-                    return productToRemoveResult;
-
-                BaseResult<Product> validateOnProductExitstInCategoryResult = _categoryValidator.ValidateOnProductExistsInCategory(category.Data, productToRemoveResult.Data);
-
-                if(!validateOnProductExitstInCategoryResult.IsSuccess)
-                    return validateOnProductExitstInCategoryResult;
-
-                return await RemoveProductFromCategoryAsync(category, productToRemoveResult.Data);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, ex.Message);
-
-                return new BaseResult<Product>()
-                {
-                    ErrorCode = (int)ErrorCodes.InternalServerError,
-                    ErrorMessage = ErrorCodes.InternalServerError.ToString(),
+                    ErrorCode = (int)ErrorCodes.CategoryNotFound,
+                    ErrorMessage = ErrorCodes.CategoryNotFound.ToString(),
                 };
             }
+
+            return new CollectionResult<CharacteristicPattern>() { Count = category.CharacteristicPatterns.Count, Data = category.CharacteristicPatterns };
         }
-        
-        private async Task<BaseResult<Product>> RemoveProductFromCategoryAsync(BaseResult<Category> category, Product productToRemove)
+
+        public async Task<BaseResult<CharacteristicPattern>> ChangeCharacteristicNameByNameAsync(Guid categoryId, string characteristicPatternName, string newCharacteristicPatternName)
         {
-            List<Product> products = category.Data.Products.ToList();
-            products.Remove(productToRemove);
+            Category category = await _categoryRepository.GetByIdAsync(categoryId);
 
-            Category updatedCategory = new Category(category.Data.Id, category.Data.Name, products, category.Data.Characteristics);
+            if(category == null)
+            {
+                return new BaseResult<CharacteristicPattern>()
+                {
+                    ErrorCode = (int)ErrorCodes.CharacteristicNotFound,
+                    ErrorMessage = ErrorCodes.CharacteristicNotFound.ToString(),
+                };
+            }
 
-            BaseResult<Category> updateResult = await _categoryRepository.UpdateAsync(updatedCategory);
 
-            return new BaseResult<Product>() { Data = productToRemove };
+        }
+
+        public Task<CharacteristicPattern> AddCharacteristicsToCategoryAsync(Guid categoryId, List<Guid> characteristicsId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<CharacteristicPattern> DeleteCharacteristicsFromCategoryAsync(Guid categoryId, List<Guid> characteristicsId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

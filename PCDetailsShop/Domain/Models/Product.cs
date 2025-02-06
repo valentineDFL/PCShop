@@ -9,7 +9,8 @@ namespace Domain.Models
     public class Product
     {
         public Product(Guid id, string name, string description, decimal price,
-            float weight, IReadOnlyList<Category> categories)
+            float weight, IReadOnlyList<Category> categories, 
+            List<CharacteristicRealization> characteristicsRealization, int amount)
         {
             Id = id;
             Name = name;
@@ -17,6 +18,8 @@ namespace Domain.Models
             Price = price;
             Weight = weight;
             Categories = categories;
+            CharacteristicsRelization = characteristicsRealization;
+            Amount = amount;
         }
 
         public Guid Id { get; }
@@ -29,8 +32,14 @@ namespace Domain.Models
 
         public float Weight { get; }
 
+        public bool StockAvailability => Amount > 0;
+
+        public int Amount { get; }
+
 
         // Навигационное свойство
         public IReadOnlyList<Category> Categories { get; }
+
+        public IReadOnlyList<CharacteristicRealization> CharacteristicsRelization { get; }  
     }
 }

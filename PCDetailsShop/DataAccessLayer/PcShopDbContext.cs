@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using DataAccessLayer.Entities;
+using DataAccessLayer.Entities.Characteristic;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccessLayer
@@ -24,12 +25,12 @@ namespace DataAccessLayer
 
         public DbSet<CategoryEntity> Categories { get; set; }
 
-        public DbSet<CharacteristicEntity> Characteristics { get; set; }
+        public DbSet<CharacteristicPatternEntity> CharacteristicPatterns { get; set; }
+
+        public DbSet<CharacteristicRealizationEntity> CharacteristicRealizing { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            
-
             base.OnConfiguring(optionsBuilder);
         }
 
@@ -39,6 +40,5 @@ namespace DataAccessLayer
 
             base.OnModelCreating(modelBuilder);
         }
-
     }
 }

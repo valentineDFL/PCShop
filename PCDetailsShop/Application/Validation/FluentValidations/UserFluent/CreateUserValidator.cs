@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Domain.Dto.UserDtos;
 using Domain.Enums;
 using FluentValidation;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace Application.Validation.FluentValidations.UserFluent
 {
@@ -14,23 +15,17 @@ namespace Application.Validation.FluentValidations.UserFluent
         public CreateUserValidator()
         {
             RuleFor(x => x.Login).NotEmpty()
-                .Must(IllegalSymbols.NotContainsIllegalCharacter)
-                .WithMessage(ValidationMessages.TurnedLoginContainIllegalCharacters)
                 .MaximumLength(32);
 
             RuleFor(x => x.Password).NotEmpty()
-                .MaximumLength(32)
-                .Must(IllegalSymbols.NotContainsIllegalCharacter)
-                .WithMessage(ValidationMessages.TurnedPasswordContainIllegalCharacters);
+                .MaximumLength(32);
 
             RuleFor(x => x.Email).NotEmpty()
-                .MaximumLength(32)
-                .Must(IllegalSymbols.NotContainsIllegalCharacter)
-                .WithMessage(ValidationMessages.TurnedEmailContainIllegalCharacters);
+                .MaximumLength(32);
 
             RuleFor(x => x.BirthDate).NotEmpty()
                 .Must(x => x.Year >= 18)
-                .WithMessage(ValidationMessages.TheUserMustBeOver16YearsOfAge);
+                .WithMessage("The User Must Be Over 16 Years Of Age");
         }
     }
 }

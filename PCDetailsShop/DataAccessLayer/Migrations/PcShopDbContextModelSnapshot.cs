@@ -37,19 +37,19 @@ namespace DataAccessLayer.Migrations
                     b.ToTable("CartEntityProductEntity");
                 });
 
-            modelBuilder.Entity("CategoryEntityCharacteristicEntity", b =>
+            modelBuilder.Entity("CategoryEntityCharacteristicPatternEntity", b =>
                 {
                     b.Property<Guid>("CategoryEntityId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("CharacteristicsId")
+                    b.Property<Guid>("CharacteristicPatternsId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("CategoryEntityId", "CharacteristicsId");
+                    b.HasKey("CategoryEntityId", "CharacteristicPatternsId");
 
-                    b.HasIndex("CharacteristicsId");
+                    b.HasIndex("CharacteristicPatternsId");
 
-                    b.ToTable("CategoryEntityCharacteristicEntity");
+                    b.ToTable("CategoryEntityCharacteristicPatternEntity");
                 });
 
             modelBuilder.Entity("CategoryEntityProductEntity", b =>
@@ -65,6 +65,21 @@ namespace DataAccessLayer.Migrations
                     b.HasIndex("ProductsId");
 
                     b.ToTable("CategoryEntityProductEntity");
+                });
+
+            modelBuilder.Entity("CharacteristicRealizeEntityProductEntity", b =>
+                {
+                    b.Property<Guid>("CharacteristicsRealizingId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ProductEntityId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("CharacteristicsRealizingId", "ProductEntityId");
+
+                    b.HasIndex("ProductEntityId");
+
+                    b.ToTable("CharacteristicRealizeEntityProductEntity");
                 });
 
             modelBuilder.Entity("DataAccessLayer.Entities.CartEntity", b =>
@@ -108,7 +123,7 @@ namespace DataAccessLayer.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("DataAccessLayer.Entities.CharacteristicEntity", b =>
+            modelBuilder.Entity("DataAccessLayer.Entities.Characteristic.CharacteristicPatternEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -119,6 +134,20 @@ namespace DataAccessLayer.Migrations
                         .HasMaxLength(32)
                         .HasColumnType("character varying(32)");
 
+                    b.HasKey("Id");
+
+                    b.ToTable("CharacteristicPatterns");
+                });
+
+            modelBuilder.Entity("DataAccessLayer.Entities.Characteristic.CharacteristicRealizeEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CharacteristicPatternId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Value")
                         .IsRequired()
                         .HasMaxLength(32)
@@ -126,7 +155,10 @@ namespace DataAccessLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Characteristics");
+                    b.HasIndex("CharacteristicPatternId")
+                        .IsUnique();
+
+                    b.ToTable("CharacteristicRealizing");
                 });
 
             modelBuilder.Entity("DataAccessLayer.Entities.ProductEntity", b =>
@@ -213,7 +245,7 @@ namespace DataAccessLayer.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("CategoryEntityCharacteristicEntity", b =>
+            modelBuilder.Entity("CategoryEntityCharacteristicPatternEntity", b =>
                 {
                     b.HasOne("DataAccessLayer.Entities.CategoryEntity", null)
                         .WithMany()
@@ -221,9 +253,9 @@ namespace DataAccessLayer.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DataAccessLayer.Entities.CharacteristicEntity", null)
+                    b.HasOne("DataAccessLayer.Entities.Characteristic.CharacteristicPatternEntity", null)
                         .WithMany()
-                        .HasForeignKey("CharacteristicsId")
+                        .HasForeignKey("CharacteristicPatternsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -243,6 +275,21 @@ namespace DataAccessLayer.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("CharacteristicRealizeEntityProductEntity", b =>
+                {
+                    b.HasOne("DataAccessLayer.Entities.Characteristic.CharacteristicRealizeEntity", null)
+                        .WithMany()
+                        .HasForeignKey("CharacteristicsRealizingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DataAccessLayer.Entities.ProductEntity", null)
+                        .WithMany()
+                        .HasForeignKey("ProductEntityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("DataAccessLayer.Entities.CartEntity", b =>
                 {
                     b.HasOne("DataAccessLayer.Entities.UserEntity", "User")
@@ -252,6 +299,17 @@ namespace DataAccessLayer.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("DataAccessLayer.Entities.Characteristic.CharacteristicRealizeEntity", b =>
+                {
+                    b.HasOne("DataAccessLayer.Entities.Characteristic.CharacteristicPatternEntity", "CharacteristicPattern")
+                        .WithOne()
+                        .HasForeignKey("DataAccessLayer.Entities.Characteristic.CharacteristicRealizeEntity", "CharacteristicPatternId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CharacteristicPattern");
                 });
 
             modelBuilder.Entity("DataAccessLayer.Entities.UserEntity", b =>

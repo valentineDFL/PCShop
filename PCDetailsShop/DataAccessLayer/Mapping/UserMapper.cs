@@ -12,7 +12,7 @@ namespace DataAccessLayer.Mapping
 {
     internal class UserMapper
     {
-        public UserEntity ModelToEntity(User user)
+        public UserEntity ModelToEntity(User user) // modelToEntityInclude / modelToEntity
         {
             UserEntity userEntity = new UserEntity()
             {
@@ -32,6 +32,9 @@ namespace DataAccessLayer.Mapping
 
         public User EntityToModel(UserEntity userEntity)
         {
+            if (userEntity == null)
+                return null;
+
             User user = new User
                     (
                         id: userEntity.Id,

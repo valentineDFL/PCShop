@@ -12,28 +12,54 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Application.Validation.UserValidations
 {
-    internal class UserValidator : IUserValidator
+    internal class ChangeUserDataValidator : IUserValidator
     {
+        public BaseResult<User> ValidateOnNull(User user)
+        {
+            BaseResult<User> userResult = new BaseResult<User>();
+
+            if(user == null)
+            {
+                userResult.ErrorCode = (int)ErrorCodes.UserNotFound;
+                userResult.ErrorMessage = ErrorCodes.UserNotFound.ToString();
+
+                return userResult;
+            }
+
+            userResult.Data = user;
+
+            return userResult;
+        }
+
+        public CollectionResult<User> ValidateOnNull(List<User> users)
+        {
+            CollectionResult<User> usersResult = new CollectionResult<User>();
+
+            if (users == null)
+            {
+                usersResult.ErrorCode = (int)ErrorCodes.UsersNotFound;
+                usersResult.ErrorMessage = ErrorCodes.UsersNotFound.ToString();
+
+                return usersResult;
+            }
+
+            usersResult.Data = users;
+            usersResult.Count = users.Count;
+
+            return usersResult;
+        }
+
         public BaseResult<User> ValidateOnExists(User user, CreateUserDto dto)
         {
             if (user != null)
             {
                 int errorCode = 0;
-                int count = 0;
 
                 if (user.Login == dto.Login)
-                {
                     errorCode = (int)ErrorCodes.UserWithTurnedLoginAlreadyExists;
-                    count++;
-                }
-                else if (user.Email == dto.Email)
-                {
-                    errorCode = (int)ErrorCodes.UserWithTurnedEmailAlreadyExists;
-                    count++;
-                }
 
-                if (count == 2)
-                    errorCode = (int)ErrorCodes.UserWithTurnerdEmailAndLoginAlreadyExists;
+                else if (user.Email == dto.Email)
+                    errorCode = (int)ErrorCodes.UserWithTurnedEmailAlreadyExists;
 
                 return new BaseResult<User>()
                 {
@@ -47,18 +73,15 @@ namespace Application.Validation.UserValidations
 
         public BaseResult<string> ValidateOnLoginExists(User user, string newLogin)
         {
-            if (user != null)
+            if (user.Login == newLogin)
             {
-                if (user.Login == newLogin)
+                return new BaseResult<string>()
                 {
-                    return new BaseResult<string>()
-                    {
-                        ErrorCode = (int)ErrorCodes.UserWithTurnedLoginAlreadyExists,
-                        ErrorMessage = ErrorCodes.UserAlreadyExists.ToString()
-                    };
-                }
+                    ErrorCode = (int)ErrorCodes.UserWithTurnedLoginAlreadyExists,
+                    ErrorMessage = ErrorCodes.UserAlreadyExists.ToString()
+                };
             }
-
+            
             return new BaseResult<string>();
         }
 

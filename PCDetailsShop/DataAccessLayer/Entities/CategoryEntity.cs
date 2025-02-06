@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DataAccessLayer.Entities.Characteristic;
 
 namespace DataAccessLayer.Entities
 {
@@ -15,6 +16,6 @@ namespace DataAccessLayer.Entities
         public List<ProductEntity> Products { get; set; } // при маппинге делать налл категорий
         //  после маппить категории, а потом делать наоборот.
 
-        public List<CharacteristicEntity> Characteristics { get; set; }
+        public List<CharacteristicPatternEntity> CharacteristicPatterns { get; set; }
     }
 }

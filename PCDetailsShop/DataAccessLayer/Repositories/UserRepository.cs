@@ -26,30 +26,16 @@ namespace DataAccessLayer.Repositories
             _userMapper = userMapper;
         }
 
-        public async Task<CollectionResult<User>> GetAllAsync()
+        public async Task<List<User>> GetAllAsync()
         {
             List<UserEntity> entities = await _dbContext.Users.ToListAsync();
 
-            if (entities.Count == 0)
-            {
-                return new CollectionResult<User>()
-                {
-                    Count = 0,
-                    ErrorCode = (int)ErrorCodes.UsersNotFound,
-                    ErrorMessage = ErrorCodes.UsersNotFound.ToString(),
-                };
-            }
-
             List<User> users = await _userMapper.EntitiesToModelsAsync(entities);
 
-            return new CollectionResult<User>()
-            {
-                Count = users.Count,
-                Data = users,
-            };
+            return users;
         }
 
-        public async Task<BaseResult<User>> CreateAsync(User user)
+        public async Task<User> CreateAsync(User user)
         {
             if(user == null)
                 throw new ArgumentNullException($"User Null {nameof(CreateAsync)}");
@@ -59,52 +45,34 @@ namespace DataAccessLayer.Repositories
             await _dbContext.Users.AddAsync(entity);
             await _dbContext.SaveChangesAsync();
 
-            return new BaseResult<User>() { Data = user };
+            return user;
         }
 
-        public async Task<BaseResult<Guid>> DeleteAsync(Guid id)
+        public async Task<int> DeleteAsync(Guid id)
         {
-            if(id == Guid.Empty) 
+            if(id == Guid.Empty)
                 throw new ArgumentException($"User id is Empty {nameof(DeleteAsync)}");
 
             int countRemovedUsers = await _dbContext.Users
                 .Where(u => u.Id == id)
                 .ExecuteDeleteAsync();
 
-            if(countRemovedUsers == 0)
-            {
-                return new BaseResult<Guid>()
-                {
-                    ErrorCode = (int)ErrorCodes.UserNotFound,
-                    ErrorMessage = ErrorCodes.UserNotFound.ToString(),
-                };
-            }
-
             await _dbContext.SaveChangesAsync();
 
-            return new BaseResult<Guid>() { Data = id };
+            return countRemovedUsers;
         }
 
-        public async Task<BaseResult<User>> GetByIdAsync(Guid id)
+        public async Task<User> GetByIdAsync(Guid id)
         {
             UserEntity user = await _dbContext.Users
                 .FirstOrDefaultAsync(p => p.Id == id);
 
-            if(user == null)
-            {
-                return new BaseResult<User>()
-                {
-                    ErrorCode = (int)ErrorCodes.UserNotFound,
-                    ErrorMessage = ErrorCodes.UserNotFound.ToString(),
-                };
-            }
-
             User result = _userMapper.EntityToModel(user);
 
-            return new BaseResult<User>() { Data = result };
+            return result;
         }
 
-        public async Task<BaseResult<User>> GetByLoginAsync(string login)
+        public async Task<User> GetByLoginAsync(string login)
         {
             if(string.IsNullOrEmpty(login))
                 throw new ArgumentNullException($"User login Null or Empty {nameof(ChangeLoginAsync)}");
@@ -112,114 +80,82 @@ namespace DataAccessLayer.Repositories
             UserEntity userEntity = await _dbContext.Users
                 .FirstOrDefaultAsync(u => u.Login == login);
 
-            if(userEntity == null)
-            {
-                return new BaseResult<User>()
-                {
-                    ErrorCode = (int)ErrorCodes.UserNotFound,
-                    ErrorMessage = ErrorCodes.UserNotFound.ToString(),
-                };
-            }
+            User user = _userMapper.EntityToModel(userEntity);
+
+            return user;
+        }
+
+        public async Task<User> GetByEmailAsync(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+                throw new ArgumentNullException($"User Email Null or Empty {nameof(ChangeLoginAsync)}");
+
+            UserEntity userEntity = await _dbContext.Users
+                .FirstOrDefaultAsync(u => u.Email == email);
 
             User user = _userMapper.EntityToModel(userEntity);
 
-            return new BaseResult<User>() { Data = user };
+            return user;
         }
 
-        public async Task<BaseResult<string>> ChangeLoginAsync(Guid id, string newLogin)
+        public async Task<int> ChangeLoginAsync(Guid id, string newLogin)
         {
             if (string.IsNullOrEmpty(newLogin))
                 throw new ArgumentNullException($"User new login Null or Empty {nameof(ChangeLoginAsync)}");
 
-            int updatedProperties = await _dbContext.Users
+            int updatedUsers = await _dbContext.Users
                 .Where(u => u.Id == id)
                 .ExecuteUpdateAsync(u => u
                 .SetProperty(p => p.Login, newLogin));
 
-            if(updatedProperties == 0)
-            {
-                return new BaseResult<string>()
-                {
-                    ErrorCode = (int)ErrorCodes.UserNotFound,
-                    ErrorMessage = ErrorCodes.UserNotFound.ToString(),
-                };
-            }
-
             await _dbContext.SaveChangesAsync();
 
-            return new BaseResult<string>() { Data = newLogin };
+            return updatedUsers;
         }
 
-        public async Task<BaseResult<string>> ChangeEmailAsync(Guid id, string newEmail)
+        public async Task<int> ChangeEmailAsync(Guid id, string newEmail)
         {
             if (string.IsNullOrEmpty(newEmail))
                 throw new ArgumentNullException($"User new email Null or Empty {nameof(ChangeEmailAsync)}");
 
-            int updatedProperties = await _dbContext.Users
+            int updatedUsers = await _dbContext.Users
                 .Where(u => u.Id == id)
                 .ExecuteUpdateAsync(u => u
                 .SetProperty(p => p.Email, newEmail));
 
-            if (updatedProperties == 0)
-            {
-                return new BaseResult<string>()
-                {
-                    ErrorCode = (int)ErrorCodes.UserNotFound,
-                    ErrorMessage = ErrorCodes.UserNotFound.ToString(),
-                };
-            }
-
             await _dbContext.SaveChangesAsync();
 
-            return new BaseResult<string>() { Data = newEmail };
+            return updatedUsers;
         }
 
-        public async Task<BaseResult<string>> ChangePasswordAsync(Guid id, string newPassword)
+        public async Task<int> ChangePasswordAsync(Guid id, string newPassword)
         {
             if (string.IsNullOrEmpty(newPassword))
                 throw new ArgumentNullException($"User new password Null or Empty {nameof(ChangePasswordAsync)}");
 
-            int updatedProperties = await _dbContext.Users
+            int updatedUsers = await _dbContext.Users
                 .Where(u => u.Id == id)
                 .ExecuteUpdateAsync(u => u
                 .SetProperty(p => p.Password, newPassword));
 
-            if (updatedProperties == 0)
-            {
-                return new BaseResult<string>()
-                {
-                    ErrorCode = (int)ErrorCodes.UserNotFound,
-                    ErrorMessage = ErrorCodes.UserNotFound.ToString(),
-                };
-            }
-
             await _dbContext.SaveChangesAsync();
 
-            return new BaseResult<string>() { Data = newPassword };
+            return updatedUsers;
         }
 
-        public async Task<BaseResult<decimal>> AddMoneyToBalance(Guid id, decimal increaseSumm)
+        public async Task<int> AddMoneyToBalance(Guid id, decimal increaseSumm)
         {
             if (increaseSumm <= 0)
                 throw new ArgumentNullException($"Increase Summ must be high than 0 {nameof(AddMoneyToBalance)}");
 
-            int updatedProperties = await _dbContext.Users
+            int updatedUsers = await _dbContext.Users
                 .Where(u => u.Id == id)
                 .ExecuteUpdateAsync(u => u
                 .SetProperty(p => p.WalletBalance, p => p.WalletBalance + increaseSumm));
 
-            if (updatedProperties == 0)
-            {
-                return new BaseResult<decimal>()
-                {
-                    ErrorCode = (int)ErrorCodes.UserNotFound,
-                    ErrorMessage = ErrorCodes.UserNotFound.ToString(),
-                };
-            }
-
             await _dbContext.SaveChangesAsync();
 
-            return new BaseResult<decimal>() { Data = increaseSumm };
+            return updatedUsers;
         }
     }
 }

@@ -7,6 +7,10 @@ namespace Domain.Interfaces.Validators
 {
     public interface IUserValidator
     {
+        public BaseResult<User> ValidateOnNull(User user);
+
+        public CollectionResult<User> ValidateOnNull(List<User> users);
+
         public BaseResult<User> ValidateOnExists(User user, CreateUserDto dto);
 
         public BaseResult<string> ValidateOnLoginExists(User user, string newLogin);

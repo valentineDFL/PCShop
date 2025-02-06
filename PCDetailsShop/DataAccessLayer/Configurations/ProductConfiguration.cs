@@ -17,6 +17,9 @@ namespace DataAccessLayer.Configurations
             builder.Property(p => p.Description)
                 .IsRequired()
                 .HasMaxLength(2048);
+
+            builder.HasMany(p => p.CharacteristicsRealizing)
+                .WithMany();
         }
     }
 }

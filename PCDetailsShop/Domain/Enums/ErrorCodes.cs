@@ -24,17 +24,11 @@ namespace Domain.Enums
         TheOldEmailDoesNotMatchThePassword = 19,
         TheOldPasswordDoesNotMatchThePassword = 20,
 
-        TurnedLoginContainIllegalCharacters = 21,
-        TurnedEmailContainIllegalCharacters = 22,
-        TurnedPasswordContainIllegalCharacters = 23,
+        TheAmountToBeCreditedMustBeGreaterThanZero = 21,
 
-        TurnedOldPasswordContainIllegalCharacters = 24,
+        TheAmountToBeCreditedMustBeANumber = 22,
 
-        TheAmountToBeCreditedMustBeGreaterThanZero = 25,
-
-        TheAmountToBeCreditedMustBeANumber = 26,
-
-        NotEnoughFundsInTheUsersBalance = 26,
+        NotEnoughFundsInTheUsersBalance = 23,
 
 
         CartNotFound = 31,
@@ -54,5 +48,9 @@ namespace Domain.Enums
         TheCategoryShouldNotContainRepetitiveProducts = 54,
 
         ThereIsNoSuchProductInTheCategory = 55,
+
+
+        CharacteristicNotFound = 61,
+        CharacteristicsNotFound = 62,
     }
 }

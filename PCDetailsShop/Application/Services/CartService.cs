@@ -15,14 +15,11 @@ namespace Application.Services
 {
     internal class CartService : ICartService
     {
-        private readonly IRepository<Cart> _cartRepository;
+        private readonly ICartRepository _cartRepository;
 
-        private readonly ILogger _logger;
-
-        public CartService(IRepository<Cart> cartRepository, ILogger logger)
+        public CartService(ICartRepository cartRepository)
         {
             _cartRepository = cartRepository;
-            _logger = logger;
         }
 
         public async Task<CollectionResult<Product>> GetAllProductsInCartAsync(Guid cartId)
@@ -126,7 +123,7 @@ namespace Application.Services
         {
             try
             {
-                BaseResult<Cart> cart = await _cartRepository.GetByIdAsync(cartId);
+                BaseResult<Cart> cart = await _cartRepository.(cartId);
 
                 if (!cart.IsSuccess)
                 {

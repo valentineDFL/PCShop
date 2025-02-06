@@ -20,109 +20,69 @@ namespace Application.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
-        private readonly IRepository<Cart> _cartRepository;
+        private readonly ICartRepository _cartRepository;
 
-        private readonly ILogger _logger;
         private readonly IUserValidator _userValidator;
 
         private readonly IEncrypter _passwordEncrypter;
 
-        public UserService(IUserRepository userRepository, IRepository<Cart> cartRepository, ILogger logger, IUserValidator userValidator, IEncrypter passwordEncrypter)
+        public UserService(IUserRepository userRepository, ICartRepository cartRepository, IUserValidator userValidator, IEncrypter passwordEncrypter)
         {
             _userRepository = userRepository;
             _cartRepository = cartRepository;
-            _logger = logger;
             _userValidator = userValidator;
             _passwordEncrypter = passwordEncrypter;
         }
 
         public async Task<BaseResult<User>> GetUserByIdAsync(Guid id)
         {
-            try
-            {
-                BaseResult<User> user = await _userRepository.GetByIdAsync(id);
+            User user = await _userRepository.GetByIdAsync(id);
 
-                return user;
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, ex.Message);
+            BaseResult<User> userValidationResult = new BaseResult<User>();
 
-                return new BaseResult<User>()
-                {
-                    ErrorCode = (int)ErrorCodes.InternalServerError,
-                    ErrorMessage = ErrorCodes.InternalServerError.ToString(),
-                };
-            }
+            return userValidationResult;
         }
 
         public async Task<BaseResult<User>> GetUserByNameAsync(string name)
         {
-            try
-            {
-                BaseResult<User> user = await _userRepository.GetByLoginAsync(name);
+            User user = await _userRepository.GetByLoginAsync(name);
 
-                return user;
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, ex.Message);
+            BaseResult<User> userValidationResult = new BaseResult<User>();
 
-                return new BaseResult<User>()
-                {
-                    ErrorCode = (int)ErrorCodes.InternalServerError,
-                    ErrorMessage = ErrorCodes.InternalServerError.ToString(),
-                };
-            }
+            return userValidationResult;
         }
 
         public async Task<CollectionResult<User>> GetAllUsersAsync()
         {
-            try
-            {
-                CollectionResult<User> users = await _userRepository.GetAllAsync();
+            List<User> users = await _userRepository.GetAllAsync();
 
-                return users;
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, ex.Message);
+            CollectionResult<User> usersValidationResult = _userValidator.ValidateOnNull(users);
 
-                return new CollectionResult<User>()
-                {
-                    ErrorCode = (int)ErrorCodes.InternalServerError,
-                    ErrorMessage = ErrorCodes.InternalServerError.ToString(),
-                };
-            }
+            return usersValidationResult;
         }
 
         public async Task<BaseResult<User>> CreateUserAsync(CreateUserDto dto)
         {
-            try
+            User userWithTurnedLogin = await _userRepository.GetByLoginAsync(dto.Login);
+            User userWithTurnedEmail = await _userRepository.GetByLoginAsync(dto.Email);
+
+            if(userWithTurnedLogin != null)
             {
-                CollectionResult<User> users = await _userRepository.GetAllAsync();
+                BaseResult<User> existsLoginValidationResult = _userValidator.ValidateOnExists(userWithTurnedLogin, dto);
 
-                if (users.IsSuccess)
-                {
-                    User findedUser = users.Data.FirstOrDefault(u => u.Login == dto.Login || u.Email == dto.Email);
-                    BaseResult<User> existsValidationResult = _userValidator.ValidateOnExists(findedUser, dto);
-
-                    if (!existsValidationResult.IsSuccess)
-                    return existsValidationResult;
-                }
-
-                return await CreateUserAndCart(dto);
+                if (!existsLoginValidationResult.IsSuccess)
+                    return existsLoginValidationResult;
             }
-            catch (Exception ex)
+
+            if(userWithTurnedLogin != null)
             {
-                _logger.Error(ex, ex.Message);
+                BaseResult<User> existsEmailValidationResult = _userValidator.ValidateOnExists(userWithTurnedEmail, dto);
 
-                return new BaseResult<User>()
-                {
-                    ErrorCode = (int)ErrorCodes.InternalServerError,
-                    ErrorMessage = ErrorCodes.InternalServerError.ToString(),
-                };
+                if(!existsEmailValidationResult.IsSuccess)
+                return existsEmailValidationResult;
             }
+
+            return await CreateUserAndCart(dto);
         }
 
         private async Task<BaseResult<User>> CreateUserAndCart(CreateUserDto dto)
@@ -130,193 +90,196 @@ namespace Application.Services
             Guid userId = Guid.NewGuid();
             Guid CartId = Guid.NewGuid();
 
-
             string password = _passwordEncrypter.Encrypt(dto.Password);
-            User user = new User(userId, dto.Login, dto.Email, password, 0, dto.BirthDate, DateTime.UtcNow, null, CartId);
-            BaseResult<User> result = await _userRepository.CreateAsync(user);
+            User userForCreated = new User(userId, dto.Login, dto.Email, password, 0, dto.BirthDate, DateTime.UtcNow, null, CartId);
+            User createdUser = await _userRepository.CreateAsync(userForCreated);
 
             Cart userCart = new Cart(CartId, 0, 0, null, userId, new List<Product>());
             await _cartRepository.CreateAsync(userCart);
 
-            return result;
+            return new BaseResult<User>() { Data = createdUser };
         }
 
         public async Task<BaseResult<Guid>> DeleteUserByIdAsync(Guid id)
         {
-            try
-            {
-                BaseResult<Guid> deletedUser = await _userRepository.DeleteAsync(id);
+            int deletedUser = await _userRepository.DeleteAsync(id);
 
-                return deletedUser;
-            }
-            catch (Exception ex)
+            if(deletedUser == 0)
             {
-                _logger.Error(ex, ex.Message);
-
                 return new BaseResult<Guid>()
                 {
-                    ErrorCode = (int)ErrorCodes.InternalServerError,
-                    ErrorMessage = ErrorCodes.InternalServerError.ToString(),
+                    ErrorCode = (int)ErrorCodes.UserNotFound,
+                    ErrorMessage = ErrorCodes.UserNotFound.ToString(),
                 };
             }
+
+            return new BaseResult<Guid>() { Data = id };
         }
 
         public async Task<BaseResult<string>> ChangeUserLoginAsync(Guid id, string newLogin)
         {
-            try
+            User user = await _userRepository.GetByIdAsync(id);
+
+            BaseResult<User> userFoundValidationResult = _userValidator.ValidateOnNull(user);
+
+            if (!userFoundValidationResult.IsSuccess)
             {
-                BaseResult<User> user = await _userRepository.GetByIdAsync(id);
-
-                if (user.IsSuccess)
-                {
-                    return new BaseResult<string>()
-                    {
-                        ErrorCode = user.ErrorCode,
-                        ErrorMessage = user.ErrorMessage,
-                    };
-                }
-
-                BaseResult<string> loginRepeatValidationResult = _userValidator.ValidateOnLoginRepeat(user.Data.Login, newLogin);
-                
-                if(!loginRepeatValidationResult.IsSuccess)
-                    return loginRepeatValidationResult;
-
-                BaseResult<User> userWithTurnedLogin = await _userRepository.GetByLoginAsync(newLogin);
-
-                BaseResult<string> loginExistsValidationResult = _userValidator.ValidateOnLoginExists(userWithTurnedLogin.Data, newLogin);
-
-                if(!loginExistsValidationResult.IsSuccess)
-                    return loginExistsValidationResult;
-
-                return await _userRepository.ChangeLoginAsync(id, newLogin);
-
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, ex.Message);
-
                 return new BaseResult<string>()
                 {
-                    ErrorCode = (int)ErrorCodes.InternalServerError,
-                    ErrorMessage = ErrorCodes.InternalServerError.ToString(),
+                    ErrorCode = userFoundValidationResult.ErrorCode,
+                    ErrorMessage = userFoundValidationResult.ErrorMessage,
                 };
             }
+
+            BaseResult<string> changeLoginValidatioResult = await ChangeLoginValidation(user.Login, newLogin);
+
+            if (!changeLoginValidatioResult.IsSuccess)
+                return changeLoginValidatioResult;
+
+            int updatedUsers = await _userRepository.ChangeLoginAsync(id, newLogin);
+
+            if(updatedUsers == 0)
+            {
+                return new BaseResult<string>()
+                {
+                    ErrorCode = (int)ErrorCodes.UserNotFound,
+                    ErrorMessage = ErrorCodes.UserNotFound.ToString()
+                };
+            }
+
+            return new BaseResult<string>() { Data = newLogin };
+        }
+
+        private async Task<BaseResult<string>> ChangeLoginValidation(string oldLogin, string newLogin)
+        {
+            BaseResult<string> loginRepeatValidationResult = _userValidator.ValidateOnLoginRepeat(oldLogin, newLogin);
+
+            if (!loginRepeatValidationResult.IsSuccess)
+                return loginRepeatValidationResult;
+
+            User userWithTurnedLogin = await _userRepository.GetByLoginAsync(newLogin);
+
+            BaseResult<string> loginExistsValidationResult = _userValidator.ValidateOnLoginExists(userWithTurnedLogin, newLogin);
+
+            if (!loginExistsValidationResult.IsSuccess)
+                return loginExistsValidationResult;
+
+            return new BaseResult<string>();
         }
 
         public async Task<BaseResult<string>> ChangeUserEmailAsync(Guid id, string newEmail)
         {
-            try
+            User user = await _userRepository.GetByIdAsync(id);
+
+            if (user == null)
             {
-                BaseResult<User> user = await _userRepository.GetByIdAsync(id);
-
-                if (!user.IsSuccess)
-                {
-                    return new BaseResult<string>()
-                    {
-                        ErrorCode = user.ErrorCode,
-                        ErrorMessage = user.ErrorMessage,
-                    };
-                }
-
-                BaseResult<string> emailRepeatValidationResult = _userValidator.ValidateOnEmailRepeat(user.Data.Email, newEmail);
-
-                if (!emailRepeatValidationResult.IsSuccess)
-                    return emailRepeatValidationResult;
-
-                CollectionResult<User> users = await _userRepository.GetAllAsync();
-
-                User userWithTurnedEmail = users.Data.FirstOrDefault(u => u.Email == newEmail);
-
-                BaseResult<string> emailExistsValidationResult = _userValidator.ValidateOnEmailExists(userWithTurnedEmail, newEmail);
-
-                if(!emailExistsValidationResult.IsSuccess)
-                    return emailExistsValidationResult;
-
-                return await _userRepository.ChangeEmailAsync(id, newEmail);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, ex.Message);
-
                 return new BaseResult<string>()
                 {
-                    ErrorCode = (int)ErrorCodes.InternalServerError,
-                    ErrorMessage = ErrorCodes.InternalServerError.ToString(),
+                    ErrorCode = (int)ErrorCodes.UserNotFound,
+                    ErrorMessage = ErrorCodes.UserNotFound.ToString(),
                 };
             }
+
+            BaseResult<string> emailChangeValidation = await ChangeEmailValidation(user.Email, newEmail);
+
+            int updatedUsers = await _userRepository.ChangeEmailAsync(id, newEmail);
+
+            if(updatedUsers == 0)
+            {
+                return new BaseResult<string>()
+                {
+                    ErrorCode = (int)ErrorCodes.UserNotFound,
+                    ErrorMessage = ErrorCodes.UserNotFound.ToString(),
+                };
+            }
+
+            return new BaseResult<string>() { Data = newEmail };
+        }
+
+        private async Task<BaseResult<string>> ChangeEmailValidation(string oldEmail, string newEmail)
+        {
+            BaseResult<string> emailRepeatValidationResult = _userValidator.ValidateOnEmailRepeat(oldEmail, newEmail);
+
+            if (!emailRepeatValidationResult.IsSuccess)
+                return emailRepeatValidationResult;
+
+            User userWithTurnedEmail = await _userRepository.GetByEmailAsync(newEmail);
+
+            BaseResult<string> emailExistsValidationResult = _userValidator.ValidateOnEmailExists(userWithTurnedEmail, newEmail);
+
+            if (!emailExistsValidationResult.IsSuccess)
+                return emailExistsValidationResult;
+
+            return new BaseResult<string>();
         }
 
         public async Task<BaseResult<string>> ChangeUserPasswordAsync(Guid id, string oldPassword, string newPassword)
         {
-            try
+            User user = await _userRepository.GetByIdAsync(id);
+
+            if (user == null)
             {
-                BaseResult<User> user = await _userRepository.GetByIdAsync(id);
-
-                if (!user.IsSuccess)
-                {
-                    return new BaseResult<string>()
-                    {
-                        ErrorCode = user.ErrorCode,
-                        ErrorMessage = user.ErrorMessage,
-                    };
-                }
-
-                string userPassword = user.Data.Password;
-
-                oldPassword = _passwordEncrypter.Encrypt(oldPassword);
-                newPassword = _passwordEncrypter.Encrypt(newPassword);
-
-                BaseResult<string> passwordRepeatValidationResult = _userValidator.ValidateOnPasswordRepeat(userPassword, newPassword);
-
-                if (!passwordRepeatValidationResult.IsSuccess)
-                    return passwordRepeatValidationResult;
-
-                return await _userRepository.ChangePasswordAsync(id, newPassword);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, ex.Message);
-
                 return new BaseResult<string>()
                 {
-                    ErrorCode = (int)ErrorCodes.InternalServerError,
-                    ErrorMessage = ErrorCodes.InternalServerError.ToString(),
+                    ErrorCode = (int)ErrorCodes.UserNotFound,
+                    ErrorMessage = ErrorCodes.UserNotFound.ToString(),
                 };
             }
+
+            string userPassword = user.Password;
+
+            oldPassword = _passwordEncrypter.Encrypt(oldPassword);
+            newPassword = _passwordEncrypter.Encrypt(newPassword);
+
+            BaseResult<string> passwordRepeatValidationResult = _userValidator.ValidateOnPasswordRepeat(userPassword, newPassword);
+
+            if (!passwordRepeatValidationResult.IsSuccess)
+                return passwordRepeatValidationResult;
+
+            int updatedUsers = await _userRepository.ChangePasswordAsync(id, newPassword);
+
+            if(updatedUsers == 0)
+            {
+                return new BaseResult<string>()
+                {
+                    ErrorCode = (int)ErrorCodes.UserNotFound,
+                    ErrorMessage = ErrorCodes.UserNotFound.ToString(),
+                };
+            }
+
+            return new BaseResult<string>() { Data = "Password Changed" };
         }
 
         public async Task<BaseResult<decimal>> AddMoneyToBalanceAsync(Guid id, decimal increaseSumm)
         {
-            try
+            BaseResult<decimal> creditValidationResult = _userValidator.ValidateOnCredit(increaseSumm);
+
+            if (!creditValidationResult.IsSuccess)
+                return creditValidationResult;
+
+            User user = await _userRepository.GetByIdAsync(id);
+
+            if (user == null)
             {
-                BaseResult<decimal> creditValidationResult = _userValidator.ValidateOnCredit(increaseSumm);
-
-                if (!creditValidationResult.IsSuccess)
-                    return creditValidationResult;
-
-                BaseResult<User> user = await _userRepository.GetByIdAsync(id);
-
-                if (!user.IsSuccess)
-                {
-                    return new BaseResult<decimal>()
-                    {
-                        ErrorCode = user.ErrorCode,
-                        ErrorMessage = user.ErrorMessage,
-                    };
-                }
-
-                return await _userRepository.AddMoneyToBalance(id, increaseSumm);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, ex.Message);
-
                 return new BaseResult<decimal>()
                 {
-                    ErrorCode = (int)ErrorCodes.InternalServerError,
-                    ErrorMessage = ErrorCodes.InternalServerError.ToString(),
+                    ErrorCode = (int)ErrorCodes.UserNotFound,
+                    ErrorMessage = ErrorCodes.UserNotFound.ToString(),
                 };
             }
+
+            int updatedUser = await _userRepository.AddMoneyToBalance(id, increaseSumm);
+
+            if(updatedUser == 0)
+            {
+                return new BaseResult<decimal>()
+                {
+                    ErrorCode = (int)ErrorCodes.UserNotFound,
+                    ErrorMessage = ErrorCodes.UserNotFound.ToString(),
+                };
+            }
+
+            return new BaseResult<decimal>() { Data = increaseSumm };
         }
     }
 }

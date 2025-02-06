@@ -10,22 +10,24 @@ namespace Domain.Interfaces.Repositories
 {
     public interface IUserRepository
     {
-        public Task<CollectionResult<User>> GetAllAsync();
+        public Task<List<User>> GetAllAsync();
 
-        public Task<BaseResult<User>> GetByIdAsync(Guid id);
+        public Task<User> GetByIdAsync(Guid id);
 
-        public Task<BaseResult<User>> GetByLoginAsync(string name);
+        public Task<User> GetByLoginAsync(string name);
 
-        public Task<BaseResult<User>> CreateAsync(User user);
+        public Task<User> GetByEmailAsync(string email);
 
-        public Task<BaseResult<string>> ChangeLoginAsync(Guid id, string newLogin);
+        public Task<User> CreateAsync(User user);
 
-        public Task<BaseResult<string>> ChangeEmailAsync(Guid id, string newEmail);
+        public Task<int> ChangeLoginAsync(Guid id, string newLogin);
 
-        public Task<BaseResult<string>> ChangePasswordAsync(Guid id, string newPassword);
+        public Task<int> ChangeEmailAsync(Guid id, string newEmail);
 
-        public Task<BaseResult<decimal>> AddMoneyToBalance(Guid id, decimal increaseSumm);
+        public Task<int> ChangePasswordAsync(Guid id, string newPassword);
 
-        public Task<BaseResult<Guid>> DeleteAsync(Guid id);
+        public Task<int> AddMoneyToBalance(Guid id, decimal increaseSumm);
+
+        public Task<int> DeleteAsync(Guid id);
     }
 }

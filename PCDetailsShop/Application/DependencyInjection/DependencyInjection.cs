@@ -33,7 +33,7 @@ namespace Application.DependencyInjection
 
         private static void InitUserService(this IServiceCollection services)
         {
-            services.AddScoped<IUserValidator, UserValidator>();
+            services.AddScoped<IUserValidator, ChangeUserDataValidator>();
             services.AddScoped<IValidator<CreateUserDto>, CreateUserValidator>();
 
             services.AddScoped<IUserService, UserService>();

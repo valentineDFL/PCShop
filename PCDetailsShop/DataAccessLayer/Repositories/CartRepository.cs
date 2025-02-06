@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataAccessLayer.Repositories
 {
-    internal class CartRepository : IRepository<Cart>
+    internal class CartRepository : ICartRepository
     {
         private readonly PcShopDbContext _dbContext;
         private readonly CartMapper _cartMapper;

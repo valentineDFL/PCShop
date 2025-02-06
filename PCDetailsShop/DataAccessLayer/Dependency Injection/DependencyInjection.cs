@@ -34,9 +34,9 @@ namespace DataAccessLayer.Dependency_Injection
 
             services.AddScoped<IUserRepository, UserRepository>();
 
-            services.AddScoped<IRepository<Cart>, CartRepository>();
-            //services.AddScoped<IRepository<Product>, ProductRepository>();
-            //services.AddScoped<IRepository<Category>, CategoryRepository>();
+            services.AddScoped<ICartRepository, CartRepository>();
+            //services.AddScoped<IProductRepository, ProductRepository>();
+            //services.AddScoped<ICategoryRepository, CategoryRepository>();
         }
 
         private static void InitMapping(this IServiceCollection services)

@@ -13,14 +13,14 @@ using PCDetailsShop.API.DtoMapping;
 namespace PCDetailsShop.API.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
-    public class UserController : ControllerBase
+    [Route("users")]
+    public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
         private readonly IValidator<CreateUserDto> _createUserValidator;
         private readonly IBaseMapper<User, UserDto> _userDtoMapper;
 
-        public UserController(IUserService userService, IValidator<CreateUserDto> createUserValidator,
+        public UsersController(IUserService userService, IValidator<CreateUserDto> createUserValidator,
             IBaseMapper<User, UserDto> userDtoMapper)
         {
             _userService = userService;
@@ -28,7 +28,7 @@ namespace PCDetailsShop.API.Controllers
             _userDtoMapper = userDtoMapper;
         }
 
-        [HttpPost("CreateUser")]
+        [HttpPost]
         public async Task<ActionResult<BaseResult<UserDto>>> CreateUserAsync(CreateUserDto dto)
         {
             ValidationResult validationResult = await _createUserValidator.ValidateAsync(dto);
@@ -47,7 +47,7 @@ namespace PCDetailsShop.API.Controllers
             return BadRequest(response);
         }
 
-        [HttpDelete("DeleteUser")]
+        [HttpDelete("{id:guid}")]
         public async Task<ActionResult<BaseResult<UserDto>>> DeleteUserByIdAsync(Guid id)
         {
             BaseResult<Guid> response = await _userService.DeleteUserByIdAsync(id);
@@ -58,7 +58,7 @@ namespace PCDetailsShop.API.Controllers
             return BadRequest(response);
         }
 
-        [HttpGet("GetUserById")]
+        [HttpGet("{id:guid}")]
         public async Task<ActionResult<BaseResult<UserDto>>> GetUserById(Guid id)
         {
             BaseResult<User> response = await _userService.GetUserByIdAsync(id);
@@ -72,7 +72,7 @@ namespace PCDetailsShop.API.Controllers
             return BadRequest(response);
         }
 
-        [HttpGet("GetAllUsers")]
+        [HttpGet]
         public async Task<ActionResult<CollectionResult<UserDto>>> GetAllUsersAsync()
         {
             CollectionResult<User> response = await _userService.GetAllUsersAsync();
@@ -86,7 +86,7 @@ namespace PCDetailsShop.API.Controllers
             return BadRequest(response);
         }
 
-        [HttpGet("GetUserByName")]
+        [HttpGet("{name:string}")]
         public async Task<ActionResult<CollectionResult<UserDto>>> GetUserByNameAsync(string name)
         {
             BaseResult<User> response = await _userService.GetUserByNameAsync(name);
@@ -100,21 +100,10 @@ namespace PCDetailsShop.API.Controllers
             return BadRequest(response);
         }
 
-        [HttpPut("ChangeUserLoginById")]
-        public async Task<ActionResult<BaseResult<string>>> ChangeUserLoginByIdAsync(Guid userId, string newLogin)
+        [HttpPut("{id:guid}/change-login")]
+        public async Task<ActionResult<BaseResult<string>>> ChangeUserLoginByIdAsync(Guid id, string newLogin)
         {
-            if (!IllegalSymbols.NotContainsIllegalCharacter(newLogin))
-            {
-                BaseResult<string> newLoginErrorResult = new BaseResult<string>
-                {
-                    ErrorCode = (int)ErrorCodes.TurnedLoginContainIllegalCharacters,
-                    ErrorMessage = ErrorCodes.TurnedLoginContainIllegalCharacters.ToString()
-                };
-
-                return BadRequest(newLoginErrorResult);
-            }
-
-            BaseResult<string> response = await _userService.ChangeUserLoginAsync(userId, newLogin);
+            BaseResult<string> response = await _userService.ChangeUserLoginAsync(id, newLogin);
 
             if (response.IsSuccess)
                 return Ok(response);
@@ -122,21 +111,10 @@ namespace PCDetailsShop.API.Controllers
             return BadRequest(response);
         }
 
-        [HttpPut("ChangeUserEmailById")]
-        public async Task<ActionResult<BaseResult<string>>> ChangeUserEmailByIdAsync(Guid userId, string newEmail)
+        [HttpPut("{id:guid}/change-email")]
+        public async Task<ActionResult<BaseResult<string>>> ChangeUserEmailByIdAsync(Guid id, string newEmail)
         {
-            if (!IllegalSymbols.NotContainsIllegalCharacter(newEmail))
-            {
-                BaseResult<string> newEmailErrorResult = new BaseResult<string>
-                {
-                    ErrorCode = (int)ErrorCodes.TurnedEmailContainIllegalCharacters,
-                    ErrorMessage = ErrorCodes.TurnedEmailContainIllegalCharacters.ToString()
-                };
-
-                return BadRequest(newEmailErrorResult);
-            }
-
-            BaseResult<string> response = await _userService.ChangeUserEmailAsync(userId, newEmail);
+            BaseResult<string> response = await _userService.ChangeUserEmailAsync(id, newEmail);
 
             if (response.IsSuccess)
                 return Ok(response);
@@ -144,31 +122,10 @@ namespace PCDetailsShop.API.Controllers
             return BadRequest(response);
         }
 
-        [HttpPut("ChangeUserPasswordById")]
-        public async Task<ActionResult<BaseResult<string>>> ChangeUserPasswordByIdAsync(Guid userId, string oldPassword, string newPassword)
+        [HttpPut("{id:guid}/change-password")]
+        public async Task<ActionResult<BaseResult<string>>> ChangeUserPasswordByIdAsync(Guid id, string oldPassword, string newPassword)
         {
-            if (!IllegalSymbols.NotContainsIllegalCharacter(oldPassword))
-            {
-                BaseResult<string> oldPasswordErrorResult = new BaseResult<string>
-                {
-                    ErrorCode = (int)ErrorCodes.TurnedOldPasswordContainIllegalCharacters,
-                    ErrorMessage = ErrorCodes.TurnedOldPasswordContainIllegalCharacters.ToString()
-                };
-
-                return BadRequest(oldPasswordErrorResult);
-            }
-            else if (!IllegalSymbols.NotContainsIllegalCharacter(newPassword))
-            {
-                BaseResult<string> newPasswordErrorResult = new BaseResult<string>
-                {
-                    ErrorCode = (int)ErrorCodes.TurnedOldPasswordContainIllegalCharacters,
-                    ErrorMessage = ErrorCodes.TurnedOldPasswordContainIllegalCharacters.ToString()
-                };
-
-                return BadRequest(newPasswordErrorResult);
-            }
-
-            BaseResult<string> response = await _userService.ChangeUserPasswordAsync(userId, oldPassword, newPassword);
+            BaseResult<string> response = await _userService.ChangeUserPasswordAsync(id, oldPassword, newPassword);
 
             if (response.IsSuccess)
                 return Ok(response);
@@ -176,10 +133,10 @@ namespace PCDetailsShop.API.Controllers
             return BadRequest(response);
         }
 
-        [HttpPut("IncreaseWalletBalance")]
-        public async Task<ActionResult<BaseResult<decimal>>> IncreaseWalletBalance(Guid userId, decimal increaseSumm)
+        [HttpPut("{id:guid}/balance/sum")]
+        public async Task<ActionResult<BaseResult<decimal>>> IncreaseWalletBalance(Guid id, decimal sum)
         {
-            if(!decimal.TryParse(increaseSumm.ToString(), out decimal res))
+            if(!decimal.TryParse(sum.ToString(), out decimal res))
             {
                 BaseResult<decimal> increaseWalletBalanceErrorResult = new BaseResult<decimal>()
                 {
@@ -191,7 +148,7 @@ namespace PCDetailsShop.API.Controllers
             }
 
 
-            BaseResult<decimal> response = await _userService.AddMoneyToBalanceAsync(userId, increaseSumm);
+            BaseResult<decimal> response = await _userService.AddMoneyToBalanceAsync(id, sum);
 
             if(response.IsSuccess)
                 return Ok(response);

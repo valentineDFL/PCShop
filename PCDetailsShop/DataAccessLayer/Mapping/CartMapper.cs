@@ -14,7 +14,6 @@ namespace DataAccessLayer.Mapping
         private readonly UserMapper _userMapper;
         private readonly ProductMapper _productMapper;
 
-
         public CartMapper(UserMapper userMapper, ProductMapper productMapper)
         {
             _userMapper = userMapper;
