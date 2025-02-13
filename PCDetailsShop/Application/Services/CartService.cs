@@ -17,211 +17,138 @@ namespace Application.Services
     {
         private readonly ICartRepository _cartRepository;
 
-        public CartService(ICartRepository cartRepository)
+        private readonly ILogger _logger;
+
+        public CartService(ICartRepository cartRepository, ILogger logger)
         {
             _cartRepository = cartRepository;
+            _logger = logger;
         }
 
         public async Task<CollectionResult<Product>> GetAllProductsInCartAsync(Guid cartId)
         {
-            try
+            (Cart Cart, ErrorCodes errorCode) cart = await _cartRepository.GetByIdAsync(cartId);
+
+            if (cart.errorCode != ErrorCodes.None)
             {
-                BaseResult<Cart> cart = await _cartRepository.GetByIdAsync(cartId);
-
-                if (!cart.IsSuccess)
-                {
-                    return new CollectionResult<Product>()
-                    {
-                        ErrorCode = cart.ErrorCode,
-                        ErrorMessage = cart.ErrorMessage,
-                    };
-                }
-
                 return new CollectionResult<Product>()
                 {
-                    Data = cart.Data.Products,
-                    Count = cart.Data.Products.Count
+                    ErrorCode = (int)cart.errorCode,
+                    ErrorMessage = cart.errorCode.ToString(),
                 };
             }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, ex.Message);
 
-                return new CollectionResult<Product>()
-                {
-                    ErrorCode = (int)ErrorCodes.InternalServerError,
-                    ErrorMessage = ErrorCodes.InternalServerError.ToString()
-                };
-            }
+            return new CollectionResult<Product>() { Data = cart.Cart.Products, Count = cart.Cart.Products.Count };
         }
 
-        public async Task<BaseResult<decimal>> GetProductsSummCost(Guid cartId)
+        public async Task<BaseResult<decimal>> GetProductsTotalPriceByIdAsync(Guid cartId)
         {
-            try
+            (Cart Cart, ErrorCodes errorCode) cart = await _cartRepository.GetByIdAsync(cartId);
+
+            if (cart.errorCode != ErrorCodes.None)
             {
-                BaseResult<Cart> cart = await _cartRepository.GetByIdAsync(cartId);
-
-                if (!cart.IsSuccess)
-                {
-                    return new BaseResult<decimal>()
-                    {
-                        ErrorCode = cart.ErrorCode,
-                        ErrorMessage = cart.ErrorMessage,
-                    };
-                }
-
                 return new BaseResult<decimal>()
                 {
-                    Data = cart.Data.Products.Sum(x => x.Price)
+                    ErrorCode = (int)cart.errorCode,
+                    ErrorMessage = cart.errorCode.ToString(),
                 };
             }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, ex.Message);
 
-                return new BaseResult<decimal>()
-                {
-                    ErrorCode = (int)ErrorCodes.InternalServerError,
-                    ErrorMessage = ErrorCodes.InternalServerError.ToString()
-                };
-            }
+            return new BaseResult<decimal>() { Data = cart.Cart.CartTotalPrice };
         }
 
-        public async Task<BaseResult<float>> GetProductsSummWeight(Guid cartId)
+        public async Task<BaseResult<float>> GetProductsTotalWeightAsync(Guid cartId)
         {
-            try
+            (Cart cart, ErrorCodes errorCode) cart = await _cartRepository.GetByIdAsync(cartId);
+
+            if (cart.errorCode != ErrorCodes.None)
             {
-                BaseResult<Cart> cart = await _cartRepository.GetByIdAsync(cartId);
-
-                if (!cart.IsSuccess)
-                {
-                    return new BaseResult<float>()
-                    {
-                        ErrorCode = cart.ErrorCode,
-                        ErrorMessage = cart.ErrorMessage,
-                    };
-                }
-
                 return new BaseResult<float>()
                 {
-                    Data = cart.Data.Products.Sum(x => x.Weight)
+                    ErrorCode = (int)cart.errorCode,
+                    ErrorMessage = cart.errorCode.ToString(),
                 };
             }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, ex.Message);
 
-                return new BaseResult<float>()
-                {
-                    ErrorCode = (int)ErrorCodes.InternalServerError,
-                    ErrorMessage = ErrorCodes.InternalServerError.ToString()
-                };
-            }
+            return new BaseResult<float>() { Data = cart.cart.CartTotalWeight };
         }
 
         public async Task<CollectionResult<Product>> BuyProductsAsync(Guid cartId) // paymants service
         {
-            try
+            (Cart Cart, ErrorCodes errorCode) cart = await _cartRepository.GetByIdAsync(cartId);
+
+            if (cart.errorCode != ErrorCodes.None)
             {
-                BaseResult<Cart> cart = await _cartRepository.(cartId);
-
-                if (!cart.IsSuccess)
+                return new CollectionResult<Product>()
                 {
-                    return new CollectionResult<Product>()
-                    {
-                        ErrorCode = cart.ErrorCode,
-                        ErrorMessage = cart.ErrorMessage,
-                    };
-                }
-
-                decimal summCost = cart.Data.Products.Sum(x => x.Price);
-
-                if(cart.Data.User.WalletBalance < summCost)
-                {
-                    return new CollectionResult<Product>()
-                    {
-                        ErrorCode = (int)ErrorCodes.NotEnoughFundsInTheUsersBalance,
-                        ErrorMessage = ErrorCodes.NotEnoughFundsInTheUsersBalance.ToString()
-                    };
-                }
-
-                Cart oldCart = cart.Data;
-                Cart updatedCart = new Cart(oldCart.Id, 0, 0, oldCart.User, oldCart.UserId, new List<Product>());
-                
-
+                    ErrorCode = (int)cart.errorCode,
+                    ErrorMessage = cart.errorCode.ToString(),
+                };
             }
-            catch (Exception ex)
+
+            if (cart.Cart.Products.Count == 0)
             {
-                _logger.Error(ex, ex.Message);
+                _logger.Warning(ErrorCodes.ProductsNotFound.ToString());
 
                 return new CollectionResult<Product>()
                 {
-                    ErrorCode = (int)ErrorCodes.InternalServerError,
-                    ErrorMessage = ErrorCodes.InternalServerError.ToString()
+                    Count = 0,
+                    ErrorCode = (int)ErrorCodes.ProductsNotFound,
+                    ErrorMessage = ErrorCodes.ProductsNotFound.ToString(),
                 };
             }
-            throw new NotImplementedException();
+
+            if(cart.Cart.CartTotalPrice > cart.Cart.User.WalletBalance)
+            {
+                return new CollectionResult<Product>()
+                {
+                    ErrorCode = (int)ErrorCodes.NotEnoughFundsInTheUsersBalance,
+                    ErrorMessage = ErrorCodes.NotEnoughFundsInTheUsersBalance.ToString()
+                };
+            }
+
+            Cart updatedCart = new Cart(cart.Cart.Id, 0, 0, cart.Cart.User, cart.Cart.UserId, new List<Product>());
+
+            await _cartRepository.UpdateCartByIdAsync(cartId, updatedCart);
+
+            return new CollectionResult<Product>() { Count = cart.Cart.Products.Count, Data = cart.Cart.Products };
         }
 
         public async Task<BaseResult<Product>> RemoveProductFromCartByIdAsync(Guid cartId, Guid productId)
         {
-            try
+            (Cart Cart, ErrorCodes errorCode) cart = await _cartRepository.GetByIdAsync(cartId);
+
+            if (cart.errorCode != ErrorCodes.None)
             {
-                BaseResult<Cart> cart = await _cartRepository.GetByIdAsync(cartId);
-
-                if (!cart.IsSuccess)
-                {
-                    return new BaseResult<Product>()
-                    {
-                        ErrorCode = cart.ErrorCode,
-                        ErrorMessage = cart.ErrorMessage,
-                    };
-                }
-
-                List<Product> products = cart.Data.Products.ToList();
-
-                Product product = products.FirstOrDefault(p => p.Id == productId);
-
-                bool removeResult = products.Remove(product);
-
-                if (!removeResult)
-                {
-                    return new BaseResult<Product>()
-                    {
-                        ErrorCode = (int)ErrorCodes.ProductNotFound,
-                        ErrorMessage = ErrorCodes.ProductNotFound.ToString()
-                    };
-                }
-
-                Cart oldCart = cart.Data;
-                Cart updatedCart = new Cart(oldCart.Id, oldCart.CartTotalPrice - product.Price, oldCart.CartTotalWeight - product.Weight, oldCart.User, oldCart.UserId, products);
-
-                BaseResult<Cart> updateResult = await _cartRepository.UpdateAsync(updatedCart);
-
-                if (!updateResult.IsSuccess)
-                {
-                    return new BaseResult<Product>()
-                    {
-                        ErrorCode = updateResult.ErrorCode,
-                        ErrorMessage = updateResult.ErrorMessage,
-                    };
-                }
-
                 return new BaseResult<Product>()
                 {
-                    Data = product,
+                    ErrorCode = (int)cart.errorCode,
+                    ErrorMessage = cart.errorCode.ToString(),
                 };
             }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, ex.Message);
 
+            Product productToDelete = cart.Cart.Products.FirstOrDefault(x => x.Id == productId);
+
+            if(productToDelete == null)
+            {
                 return new BaseResult<Product>()
                 {
-                    ErrorCode = (int)ErrorCodes.InternalServerError,
-                    ErrorMessage = ErrorCodes.InternalServerError.ToString()
+                    ErrorCode = (int)ErrorCodes.CartDoesNotContainSelectedProduct,
+                    ErrorMessage = ErrorCodes.CartDoesNotContainSelectedProduct.ToString(),
                 };
             }
+
+            decimal newCartTotalPrice = cart.Cart.CartTotalPrice - productToDelete.Price;
+            float newCartTotalWeight = cart.Cart.CartTotalWeight - productToDelete.Weight;
+
+            List<Product> productsWithoutDeletedProduct = cart.Cart.Products.ToList();
+            productsWithoutDeletedProduct.Remove(productToDelete);
+
+            Cart updatedCart = new Cart(cart.Cart.Id, newCartTotalPrice, newCartTotalWeight, cart.Cart.User, cart.Cart.UserId, productsWithoutDeletedProduct);
+
+            await _cartRepository.UpdateCartByIdAsync(cartId, updatedCart);
+
+            return new BaseResult<Product>() { Data = productToDelete };
         }
     }
 }

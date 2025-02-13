@@ -8,6 +8,8 @@ namespace Domain.Models
 {
     public class CharacteristicPattern
     {
+        public CharacteristicPattern() { }
+
         public CharacteristicPattern(Guid id, string name)
         {
             Id = id;

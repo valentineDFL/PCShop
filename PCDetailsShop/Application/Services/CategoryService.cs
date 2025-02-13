@@ -1,4 +1,7 @@
-﻿using Domain.Dto.CategoryDtos;
+﻿using System.Reflection.Metadata;
+using System.Threading.Tasks;
+using Domain.Dto.CategoryDtos;
+using Domain.Dto.CharacteristicPatternDto;
 using Domain.Dto.ProductDtos;
 using Domain.Enums;
 using Domain.Interfaces.Repositories;
@@ -10,256 +13,227 @@ using Serilog;
 
 namespace Application.Services
 {
-    internal class CategoryService : ICategoryService
-    {
-        private readonly ICategoryRepository _categoryRepository;
-        private readonly IProductRepository _productRepository;
-        private readonly ICharacteristicPatternRepository _characteristicPatternRepository;
+	internal class CategoryService : ICategoryService
+	{
+		private readonly ICategoryRepository _categoryRepository;
+		private readonly ICharacteristicPatternRepository _characteristicPatternRepository;
 
-        private readonly ICategoryValidator _categoryValidator;
+		private readonly ILogger _logger;
 
-        private readonly ILogger _logger;
+		public CategoryService(ICategoryRepository categoryRepository, ICharacteristicPatternRepository characteristicPatternRepository, ILogger logger)
+		{
+			_categoryRepository = categoryRepository;
+			_characteristicPatternRepository = characteristicPatternRepository;
+			_logger = logger;
+		}
 
-        public CategoryService(ICategoryRepository categoryRepository, IProductRepository productRepository, ICharacteristicPatternRepository characteristicPatternRepository, ICategoryValidator categoryValidator, ILogger logger)
-        {
-            _categoryRepository = categoryRepository;
-            _productRepository = productRepository;
-            _characteristicPatternRepository = characteristicPatternRepository;
-            _categoryValidator = categoryValidator;
-            _logger = logger;
-        }
+		public async Task<CollectionResult<Category>> GetAllAsync()
+		{
+			List<Category> categories = await _categoryRepository.GetAllAsync();
 
-        public async Task<CollectionResult<Category>> GetAllAsync()
-        {
-            List<Category> categories = await _categoryRepository.GetAllAsync();
+			if(categories.Count == 0)
+			{
+				_logger.Warning(ErrorCodes.CategoriesNotFound.ToString());
 
-            if(categories.Count == 0)
-            {
-                _logger.Warning(ErrorCodes.CategoriesNotFound.ToString());
+				return new CollectionResult<Category>()
+				{
+					ErrorCode = (int)ErrorCodes.CategoriesNotFound,
+					ErrorMessage = ErrorCodes.CategoryNotFound.ToString(),
+				};
+			}
 
-                return new CollectionResult<Category>()
-                {
-                    ErrorCode = (int)ErrorCodes.CategoriesNotFound,
-                    ErrorMessage = ErrorCodes.CategoryNotFound.ToString(),
-                };
-            }
+			return new CollectionResult<Category>() { Data = categories };
+		}
 
-            return new CollectionResult<Category>() { Data = categories };
-        }
+		public async Task<BaseResult<Category>> GetByIdAsync(Guid categoryId)
+		{
+			(Category category, ErrorCodes errorCode) findedCategory = await _categoryRepository.GetByIdAsync(categoryId);
 
-        public async Task<BaseResult<Category>> GetByIdAsync(Guid categoryId)
-        {
-            Category category = await _categoryRepository.GetByIdAsync(categoryId);
+			if(findedCategory.errorCode != ErrorCodes.None)
+			{
+				return new BaseResult<Category>()
+				{
+					ErrorCode = (int)findedCategory.errorCode,
+					ErrorMessage = findedCategory.errorCode.ToString(),
+				};
+			}
 
-            if(category == null)
-            {
-                return new BaseResult<Category>()
-                {
-                    ErrorCode = (int)ErrorCodes.CategoryNotFound,
-                    ErrorMessage = ErrorCodes.CategoryNotFound.ToString(),
-                };
-            }
+			return new BaseResult<Category>() { Data = findedCategory.category };
+		}
 
-            return new BaseResult<Category>() { Data = category };
-        }
+		public async Task<CollectionResult<Category>> GetByNameAsync(string name)
+		{
+			List<Category> categories = await _categoryRepository.GetByNameAsync(name);
 
-        public async Task<CollectionResult<Category>> GetByNamePartAsync(string namePart)
-        {
-            List<Category> categories = await _categoryRepository.GetByNamePartAsync(namePart);
+			if (categories.Count == 0)
+			{
+				_logger.Warning(ErrorCodes.CategoriesNotFound.ToString());
 
-            if (categories.Count == 0)
-            {
-                return new CollectionResult<Category>()
-                {
-                    ErrorCode = (int)ErrorCodes.CategoriesNotFound,
-                    ErrorMessage = ErrorCodes.CategoriesNotFound.ToString(),
-                };
-            }
+				return new CollectionResult<Category>()
+				{
+					ErrorCode = (int)ErrorCodes.CategoryNotFound,
+					ErrorMessage = ErrorCodes.CategoryNotFound.ToString(),
+				};
+			}
 
-            return new CollectionResult<Category>() { Data = categories };
-        }
+			return new CollectionResult<Category>() { Count = categories.Count, Data = categories };
+		}
 
-        public async Task<BaseResult<Category>> GetByNameAsync(string name)
-        {
-            Category category = await _categoryRepository.GetByNameAsync(name);
+		public async Task<BaseResult<Category>> CreateAsync(CreateCategoryDto dto)
+		{
+			List<Category> categoryWithTurnedName = await _categoryRepository.GetByNameAsync(dto.Name);
 
-            if (category == null)
-            {
-                return new BaseResult<Category>()
-                {
-                    ErrorCode = (int)ErrorCodes.CategoryNotFound,
-                    ErrorMessage = ErrorCodes.CategoryNotFound.ToString(),
-                };
-            }
+			if(categoryWithTurnedName.Count != 0)
+			{
+				return new BaseResult<Category>()
+				{
+					ErrorCode = (int)ErrorCodes.CategoryWithTurnedNameAlreadyExists,
+					ErrorMessage = ErrorCodes.CategoryWithTurnedNameAlreadyExists.ToString()
+				};
+			}
+			
+			Guid categoryId = Guid.NewGuid();
 
-            return new BaseResult<Category>() { Data = category };
-        }
+			List<CharacteristicPattern> characteristicPatterns = CreatePatterns(dto.CharacteristicsToCreate);
 
-        public async Task<CollectionResult<Product>> GetAllCategoryProductsById(Guid categoryId)
-        {
-            Category category = await _categoryRepository.GetByIdAsync(categoryId);
+			Category categoryToCreate = new Category(categoryId, dto.Name, new List<Product>(), characteristicPatterns);
+			
+			Category createdCategory = await _categoryRepository.CreateAsync(categoryToCreate);
+			
+			return new BaseResult<Category>() { Data = createdCategory };
+		}
 
-            if(category == null)
-            {
-                return new CollectionResult<Product>()
-                {
-                    ErrorCode = (int)ErrorCodes.CategoryNotFound,
-                    ErrorMessage = ErrorCodes.CategoryNotFound.ToString(),
-                };
-            }
+		private List<CharacteristicPattern> CreatePatterns(List<CharacteristicPatternCreateDto> patternsToCreate)
+		{
+			List<CharacteristicPattern> characteristics = new List<CharacteristicPattern>();
 
-            if(category.Products.Count == 0)
-            {
-                return new CollectionResult<Product>()
-                {
-                    ErrorCode = (int)ErrorCodes.ProductsNotFound,
-                    ErrorMessage = ErrorCodes.ProductsNotFound.ToString(),
-                };
-            }
+			for (int index = 0; index < patternsToCreate.Count; index++)
+				characteristics.Add(new CharacteristicPattern(Guid.NewGuid(), patternsToCreate[index].Name));
 
-            return new CollectionResult<Product>() {Count = category.Products.Count, Data = category.Products };
-        }
+			return characteristics;
+		}
 
-        public async Task<CollectionResult<Product>> GetAllCategoryProductsByName(string name)
-        {
-            Category category = await _categoryRepository.GetByNameAsync(name);
+		public async Task<BaseResult<Guid>> DeleteByIdAsync(Guid categoryId)
+		{
+			int deletedPatternsCount = await _characteristicPatternRepository.DeleteCategoryPatternsByCategoryIdAsync(categoryId);
+			
+			if(deletedPatternsCount == 0)
+			{
+				return new BaseResult<Guid>()
+				{
+					ErrorCode = (int)ErrorCodes.CategoryNotFound,
+					ErrorMessage = ErrorCodes.CategoryNotFound.ToString(),
+				};
+			}
+			
+			int deletedCategoriesCount = await _categoryRepository.DeleteByIdAsync(categoryId);
 
-            if (category == null)
-            {
-                return new CollectionResult<Product>()
-                {
-                    ErrorCode = (int)ErrorCodes.CategoryNotFound,
-                    ErrorMessage = ErrorCodes.CategoryNotFound.ToString(),
-                };
-            }
+			return new BaseResult<Guid>() { Data = categoryId };
+		}
 
-            if (category.Products.Count == 0)
-            {
-                _logger.Warning(ErrorCodes.ProductsNotFound.ToString());
+		public async Task<BaseResult<string>> ChangeNameByIdAsync(Guid categoryId, string newName)
+		{
+			List<Category> categoriesWithTurnedNewName = await _categoryRepository.GetByNameAsync(newName);
 
-                return new CollectionResult<Product>()
-                {
-                    ErrorCode = (int)ErrorCodes.ProductsNotFound,
-                    ErrorMessage = ErrorCodes.ProductsNotFound.ToString(),
-                };
-            }
+			if(categoriesWithTurnedNewName.Count != 0)
+			{
+				return new BaseResult<string>()
+				{
+					ErrorCode = (int)ErrorCodes.CategoryWithTurnedNameAlreadyExists,
+					ErrorMessage = ErrorCodes.CategoryWithTurnedNameAlreadyExists.ToString(),
+				};
+			}
 
-            return new CollectionResult<Product>() { Count = category.Products.Count, Data = category.Products };
-        }
+			int categoriesWithChangedName = await _categoryRepository.ChangeNameAsync(categoryId, newName);
 
-        public Task<BaseResult<Category>> CreateAsync(CreateCategoryDto dto)
-        {
-            throw new NotImplementedException();
-        }
+			if(categoriesWithChangedName == 0)
+			{
+				return new BaseResult<string>()
+				{
+					ErrorCode = (int)ErrorCodes.CategoryNotFound,
+					ErrorMessage = ErrorCodes.CategoryNotFound.ToString(),
+				};
+			}
 
-        public async Task<BaseResult<Guid>> DeleteByIdAsync(Guid categoryId)
-        {
-            int deletedCategoriesCount = await _categoryRepository.DeleteByIdAsync(categoryId);
+			return new BaseResult<string>() { Data = newName };
+		}
 
-            if(deletedCategoriesCount == 0)
-            {
-                return new BaseResult<Guid>()
-                {
-                    ErrorCode = (int)ErrorCodes.CategoryNotFound,
-                    ErrorMessage = ErrorCodes.CategoryNotFound.ToString(),
-                };
-            }
+		public async Task<CollectionResult<CharacteristicPattern>> GetCharacteristicsByCategoryIdAsync(Guid categoryId)
+		{
+			(Category category, ErrorCodes errorCode) findedCategory = await _categoryRepository.GetByIdAsync(categoryId);
 
-            return new BaseResult<Guid>() { Data = categoryId };
-        }
+			if(findedCategory.errorCode != ErrorCodes.None)
+			{
+				return new CollectionResult<CharacteristicPattern>()
+				{
+					ErrorCode = (int)findedCategory.errorCode,
+					ErrorMessage = findedCategory.errorCode.ToString(),
+				};
+			}
 
-        public async Task<BaseResult<Category>> ChangeNameAsync(Guid categoryId, string newName)
-        {
-            Category category = await _categoryRepository.GetByIdAsync(categoryId);
+			if(findedCategory.category.CharacteristicPatterns.Count == 0)
+			{
+				return new CollectionResult<CharacteristicPattern>()
+				{
+					ErrorCode = (int)ErrorCodes.CharacteristicsNotFound,
+					ErrorMessage = ErrorCodes.CharacteristicsNotFound.ToString(),
+				};
+			}
 
-            if (category == null)
-            {
-                return new BaseResult<Category>()
-                {
-                    ErrorCode = (int)ErrorCodes.CategoryNotFound,
-                    ErrorMessage = ErrorCodes.CategoryNotFound.ToString(),
-                };
-            }
+			return new CollectionResult<CharacteristicPattern>() 
+			{ 
+				Count = findedCategory.category.CharacteristicPatterns.Count, 
+				Data = findedCategory.category.CharacteristicPatterns 
+			};
+		}
 
-            Category categoryWithTurnedNewName = await _categoryRepository.GetByNameAsync(newName);
+		public async Task<BaseResult<string>> ChangeCharacteristicNameByNameAsync(Guid categoryId, string characteristicPatternName, string newCharacteristicPatternName)
+		{
+			(Category category, ErrorCodes errorCode) findedCategory = await _categoryRepository.GetByIdAsync(categoryId);
 
-            BaseResult<Category> categoryNewNameExistsValidationResult = _categoryValidator.ValidateOnNameExists(categoryWithTurnedNewName);
+			if(findedCategory.errorCode != ErrorCodes.None)
+			{
+				return new BaseResult<string>()
+				{
+					ErrorCode = (int)findedCategory.errorCode,
+					ErrorMessage = findedCategory.errorCode.ToString(),
+				};
+			}
 
-            if (!categoryNewNameExistsValidationResult.IsSuccess)
-                return categoryNewNameExistsValidationResult;
+			Category category = findedCategory.category;
+			
+			CharacteristicPattern patternWithTurnedName = category.CharacteristicPatterns.FirstOrDefault(chara => chara.Name == newCharacteristicPatternName);
+			if(patternWithTurnedName != null)
+			{
+				return new BaseResult<string>()
+				{
+					ErrorCode = (int)ErrorCodes.CharacteristicWithTurnedNameAlreadyExists,
+					ErrorMessage = ErrorCodes.CharacteristicWithTurnedNameAlreadyExists.ToString()
+				};
+			}
 
-            await _categoryRepository.ChangeNameAsync(categoryId, newName);
+			CharacteristicPattern patternToUpdate = category.CharacteristicPatterns.FirstOrDefault(chara => chara.Name == characteristicPatternName);
+			if(patternToUpdate == null)
+			{
+				return new BaseResult<string>()
+				{
+					ErrorCode = (int)ErrorCodes.CharacteristicNotFound,
+					ErrorMessage = ErrorCodes.CharacteristicNotFound.ToString(),
+				};
+			}
 
-            return new BaseResult<Category>() { Data = category };
-        }
+			int updatedCharacteristic = await _characteristicPatternRepository.ChangeNameAsync(patternToUpdate.Id, newCharacteristicPatternName);
 
+			if(updatedCharacteristic == 0)
+			{
+				return new BaseResult<string>()
+				{
+					ErrorCode = (int)ErrorCodes.CategoryDoesNotContainSelectedCharacteristic,
+					ErrorMessage = ErrorCodes.CategoryDoesNotContainSelectedCharacteristic.ToString(),
+				};
+			}
 
-
-        public async Task<CollectionResult<Product>> AddProductsToCategoryAsync(Guid categoryId, List<Guid> productsId)
-        {
-            Category category = await _categoryRepository.GetByIdAsync(categoryId);
-
-            if (category == null)
-            {
-                return new CollectionResult<Product>()
-                {
-                    ErrorCode = (int)ErrorCodes.CategoryNotFound,
-                    ErrorMessage = ErrorCodes.CategoryNotFound.ToString(),
-                };
-            }
-
-            int updatedCategories = await _categoryRepository.AddProductsToCategoryAsync(categoryId, productsId);
-
-            
-
-            throw new NotImplementedException();
-        }
-
-        public Task<CollectionResult<Product>> DeleteProductsFromCategoryAsync(Guid categoryId, List<Guid> productsId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<CollectionResult<CharacteristicPattern>> GetCharacteristicsByCategoryIdAsync(Guid categoryId)
-        {
-            Category category = await _categoryRepository.GetByIdAsync(categoryId);
-
-            if(category == null)
-            {
-                return new CollectionResult<CharacteristicPattern>()
-                {
-                    ErrorCode = (int)ErrorCodes.CategoryNotFound,
-                    ErrorMessage = ErrorCodes.CategoryNotFound.ToString(),
-                };
-            }
-
-            return new CollectionResult<CharacteristicPattern>() { Count = category.CharacteristicPatterns.Count, Data = category.CharacteristicPatterns };
-        }
-
-        public async Task<BaseResult<CharacteristicPattern>> ChangeCharacteristicNameByNameAsync(Guid categoryId, string characteristicPatternName, string newCharacteristicPatternName)
-        {
-            Category category = await _categoryRepository.GetByIdAsync(categoryId);
-
-            if(category == null)
-            {
-                return new BaseResult<CharacteristicPattern>()
-                {
-                    ErrorCode = (int)ErrorCodes.CharacteristicNotFound,
-                    ErrorMessage = ErrorCodes.CharacteristicNotFound.ToString(),
-                };
-            }
-
-
-        }
-
-        public Task<CharacteristicPattern> AddCharacteristicsToCategoryAsync(Guid categoryId, List<Guid> characteristicsId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<CharacteristicPattern> DeleteCharacteristicsFromCategoryAsync(Guid categoryId, List<Guid> characteristicsId)
-        {
-            throw new NotImplementedException();
-        }
-    }
+			return new BaseResult<string>() { Data = newCharacteristicPatternName };
+		}
+	}
 }

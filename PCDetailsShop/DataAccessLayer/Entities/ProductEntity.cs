@@ -19,13 +19,13 @@ namespace DataAccessLayer.Entities
 
         public float Weight { get; set; }
 
-        public bool StockAvailability => Amount > 0; 
+        public bool StockAvailability { get; set; }
 
-        public int Amount { get; set; }
+        public int Count { get; set; }
 
         // Навигационное свойство
         public List<CategoryEntity> Categories { get; set; }
 
-        public List<CharacteristicRealizationEntity> CharacteristicsRealization { get; set; }
+        public List<CharacteristicRealizationEntity> CharacteristicsRealizations { get; set; }
     }
 }

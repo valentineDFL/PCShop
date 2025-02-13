@@ -30,9 +30,6 @@ namespace Domain.Interfaces.Repositories
 
         public Task<Category> DeleteCategoryFromProductAsync(Guid priductId, Guid categoryId);
 
-
         public Task<int> DeleteByIdAsync(Guid id);
-
-
     }
 }

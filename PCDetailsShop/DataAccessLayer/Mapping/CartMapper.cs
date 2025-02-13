@@ -22,7 +22,10 @@ namespace DataAccessLayer.Mapping
 
         public async Task<CartEntity> ModelToEntityAsync(Cart cart)
         {
-            CartEntity cartEntity = new CartEntity()
+            if (cart == null)
+                throw new ArgumentNullException($"Cart is null {nameof(ModelToEntityAsync)}");
+
+            return new CartEntity()
             {
                 Id = cart.Id,
                 CartTotalPrice = cart.CartTotalPrice,
@@ -31,35 +34,22 @@ namespace DataAccessLayer.Mapping
                 UserId = cart.UserId,
                 Products = await _productMapper.ModelsToEntitiesAsync((List<Product>)cart.Products),
             };
-
-            return cartEntity;
         }
 
         public async Task<Cart> EntityToModelAsync(CartEntity cartEntity)
         {
-            Cart cart = new Cart
+            if (cartEntity == null)
+                throw new ArgumentNullException($"Cart entity is null {nameof(EntityToModelAsync)}");
+
+            return new Cart
                     (
-                        id: cartEntity.Id,
-                        cartTotalPrice: cartEntity.CartTotalPrice,
-                        cartTotalWeight: cartEntity.CartTotalWeight,
-                        user: _userMapper.EntityToModel(cartEntity.User),
-                        userId: cartEntity.UserId,
-                        products: await _productMapper.EntitiesToModelsAsync(cartEntity.Products)
+                        cartEntity.Id,
+                        cartEntity.CartTotalPrice,
+                        cartEntity.CartTotalWeight,
+                        _userMapper.EntityToModel(cartEntity.User),
+                        cartEntity.UserId,
+                        await _productMapper.EntitiesToModelsAsync(cartEntity.Products)
                     );
-
-            return cart;
-        }
-
-        public async Task<List<Cart>> EntitiesToModelsAsync(List<CartEntity> entities)
-        {
-            List<Cart> carts = new List<Cart>();
-
-            foreach (CartEntity entity in entities)
-            {
-                carts.Add(await EntityToModelAsync(entity));
-            }
-
-            return carts;
         }
     }
 }

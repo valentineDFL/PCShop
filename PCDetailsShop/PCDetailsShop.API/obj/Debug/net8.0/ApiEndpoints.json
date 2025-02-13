@@ -1,32 +1,6 @@
 [
   {
     "ContainingType": "PCDetailsShop.API.Controllers.UsersController",
-    "Method": "CreateUserAsync",
-    "RelativePath": "users",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "dto",
-        "Type": "Domain.Dto.UserDtos.CreateUserDto",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "Domain.Result.BaseResult\u00601[[Domain.Dto.UserDtos.UserDto, Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "PCDetailsShop.API.Controllers.UsersController",
     "Method": "GetAllUsersAsync",
     "RelativePath": "users",
     "HttpMethod": "GET",
@@ -243,6 +217,32 @@
     "ReturnTypes": [
       {
         "Type": "Domain.Result.CollectionResult\u00601[[Domain.Dto.UserDtos.UserDto, Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.UsersController",
+    "Method": "CreateUserAsync",
+    "RelativePath": "users/create",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "Domain.Dto.UserDtos.CreateUserDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.BaseResult\u00601[[Domain.Dto.UserDtos.UserDto, Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",

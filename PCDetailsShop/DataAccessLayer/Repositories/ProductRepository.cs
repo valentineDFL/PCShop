@@ -1,21 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DataAccessLayer.Entities;
+﻿using DataAccessLayer.Entities;
 using DataAccessLayer.Mapping;
 using Domain.Enums;
 using Domain.Interfaces.Repositories;
 using Domain.Models;
 using Domain.Result;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 
 namespace DataAccessLayer.Repositories
 {
-    internal class ProductRepository // : IRepository<Product>
+    internal class ProductRepository // : IProductRepository
     {
         private readonly PcShopDbContext _dbContext;
         private readonly ProductMapper _productMapper;
@@ -42,7 +35,7 @@ namespace DataAccessLayer.Repositories
 
             List<Product> products = await _productMapper.EntitiesToModelsAsync(entities);
 
-            return new CollectionResult<Product>() 
+            return new CollectionResult<Product>()
             {
                 Count = products.Count,
                 Data = products
@@ -51,10 +44,7 @@ namespace DataAccessLayer.Repositories
 
         public async Task<BaseResult<Product>> CreateAsync(Product product)
         {
-            if (product == null)
-                throw new ArgumentNullException($"Product null {nameof(CreateAsync)}");
-
-            ProductEntity entity = await _productMapper.ModelToEntityAsync(product);
+            ProductEntity entity = _productMapper.ModelToEntity(product);
 
             await _dbContext.Products.AddAsync(entity);
             await _dbContext.SaveChangesAsync();
@@ -64,9 +54,6 @@ namespace DataAccessLayer.Repositories
 
         public async Task<BaseResult<Guid>> DeleteAsync(Guid id)
         {
-            if (id == Guid.Empty)
-                throw new ArgumentException($"Product id is Empty {nameof(DeleteAsync)}");
-
             int countDeletedProducts = await _dbContext.Products
                 .Where(p => p.Id == id)
                 .ExecuteDeleteAsync();
@@ -87,10 +74,7 @@ namespace DataAccessLayer.Repositories
 
         public async Task<BaseResult<Product>> UpdateAsync(Product product)
         {
-            if (product == null)
-                throw new ArgumentNullException($"Product null {nameof(UpdateAsync)}");
-
-            ProductEntity entity = await _productMapper.ModelToEntityAsync(product);
+            ProductEntity entity = _productMapper.ModelToEntity(product);
 
             int updatedProductsCount = await _dbContext.Products
                 .Where(p => p.Id == entity.Id)

@@ -67,19 +67,19 @@ namespace DataAccessLayer.Migrations
                     b.ToTable("CategoryEntityProductEntity");
                 });
 
-            modelBuilder.Entity("CharacteristicRealizeEntityProductEntity", b =>
+            modelBuilder.Entity("CharacteristicRealizationEntityProductEntity", b =>
                 {
-                    b.Property<Guid>("CharacteristicsRealizingId")
+                    b.Property<Guid>("CharacteristicsRealizationId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("ProductEntityId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("CharacteristicsRealizingId", "ProductEntityId");
+                    b.HasKey("CharacteristicsRealizationId", "ProductEntityId");
 
                     b.HasIndex("ProductEntityId");
 
-                    b.ToTable("CharacteristicRealizeEntityProductEntity");
+                    b.ToTable("CharacteristicRealizationEntityProductEntity");
                 });
 
             modelBuilder.Entity("DataAccessLayer.Entities.CartEntity", b =>
@@ -139,7 +139,7 @@ namespace DataAccessLayer.Migrations
                     b.ToTable("CharacteristicPatterns");
                 });
 
-            modelBuilder.Entity("DataAccessLayer.Entities.Characteristic.CharacteristicRealizeEntity", b =>
+            modelBuilder.Entity("DataAccessLayer.Entities.Characteristic.CharacteristicRealizationEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -167,6 +167,9 @@ namespace DataAccessLayer.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<int>("Amount")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(2048)
@@ -179,6 +182,9 @@ namespace DataAccessLayer.Migrations
 
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
+
+                    b.Property<bool>("StockAvailability")
+                        .HasColumnType("boolean");
 
                     b.Property<float>("Weight")
                         .HasColumnType("real");
@@ -275,11 +281,11 @@ namespace DataAccessLayer.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("CharacteristicRealizeEntityProductEntity", b =>
+            modelBuilder.Entity("CharacteristicRealizationEntityProductEntity", b =>
                 {
-                    b.HasOne("DataAccessLayer.Entities.Characteristic.CharacteristicRealizeEntity", null)
+                    b.HasOne("DataAccessLayer.Entities.Characteristic.CharacteristicRealizationEntity", null)
                         .WithMany()
-                        .HasForeignKey("CharacteristicsRealizingId")
+                        .HasForeignKey("CharacteristicsRealizationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -301,11 +307,11 @@ namespace DataAccessLayer.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("DataAccessLayer.Entities.Characteristic.CharacteristicRealizeEntity", b =>
+            modelBuilder.Entity("DataAccessLayer.Entities.Characteristic.CharacteristicRealizationEntity", b =>
                 {
                     b.HasOne("DataAccessLayer.Entities.Characteristic.CharacteristicPatternEntity", "CharacteristicPattern")
                         .WithOne()
-                        .HasForeignKey("DataAccessLayer.Entities.Characteristic.CharacteristicRealizeEntity", "CharacteristicPatternId")
+                        .HasForeignKey("DataAccessLayer.Entities.Characteristic.CharacteristicRealizationEntity", "CharacteristicPatternId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

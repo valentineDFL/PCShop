@@ -1,4 +1,5 @@
-﻿using Domain.Dto.ProductDtos;
+﻿using System.Dynamic;
+using Domain.Dto.ProductDtos;
 using Domain.Models;
 using Domain.Result;
 
@@ -12,7 +13,9 @@ namespace Domain.Interfaces.Services
 
         public Task<CollectionResult<Product>> GetByNamePartAsync(string namePart);
 
-        public Task<CollectionResult<Category>> GetProductCategoriesByNameAsync(string categoryName);
+        public Task<CollectionResult<Category>> GetProductCategoriesByNameAsync(string productName);
+
+        // CRUD
 
         public Task<BaseResult<Product>> CreateAsync(CreateProductDto dto);
 
@@ -31,5 +34,11 @@ namespace Domain.Interfaces.Services
         public Task<BaseResult<Category>> DeleteCategoryFromProductByIdAsync(Guid productId, Guid categoryId);
 
         public Task<BaseResult<Product>> AddProductToCartAsync(Guid productId, Guid cartId);
+
+        // Characteristics
+
+        public Task<CollectionResult<CharacteristicRealization>> GetProductCharacteristics(Guid productId);
+
+        public Task<BaseResult<CharacteristicRealization>> ChangeCharacteristicValue(Guid productId, string characteristicName, string newCharacteristicValue);
     } 
 }

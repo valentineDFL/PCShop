@@ -3,13 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35219.272
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCDetailsShop.API", "PCDetailsShop.API\PCDetailsShop.API.csproj", "{EF049E34-9045-4FF7-8B2E-56ABB80E7316}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PCDetailsShop.API", "PCDetailsShop.API\PCDetailsShop.API.csproj", "{EF049E34-9045-4FF7-8B2E-56ABB80E7316}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{41192AE8-3FE5-4785-8243-26CF2CF469AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Domain\Domain.csproj", "{41192AE8-3FE5-4785-8243-26CF2CF469AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\Application.csproj", "{F4C29C18-1CFE-418D-A753-AC3BA4197FB6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application", "Application\Application.csproj", "{F4C29C18-1CFE-418D-A753-AC3BA4197FB6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccessLayer", "DataAccessLayer\DataAccessLayer.csproj", "{E85EFADF-54C6-424E-AD94-E38DA490AF55}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccessLayer", "DataAccessLayer\DataAccessLayer.csproj", "{E85EFADF-54C6-424E-AD94-E38DA490AF55}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project_PcShop_Tests", "Project_PcShop_Tests\Project_PcShop_Tests.csproj", "{CECFC3C2-8576-4942-8B0B-575FBC54817D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{E85EFADF-54C6-424E-AD94-E38DA490AF55}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E85EFADF-54C6-424E-AD94-E38DA490AF55}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E85EFADF-54C6-424E-AD94-E38DA490AF55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CECFC3C2-8576-4942-8B0B-575FBC54817D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CECFC3C2-8576-4942-8B0B-575FBC54817D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CECFC3C2-8576-4942-8B0B-575FBC54817D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CECFC3C2-8576-4942-8B0B-575FBC54817D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

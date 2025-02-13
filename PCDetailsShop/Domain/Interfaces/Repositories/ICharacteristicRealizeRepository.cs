@@ -6,7 +6,7 @@ namespace Domain.Interfaces.Repositories
     {
         public Task<CharacteristicRealization> GetByIdAsync(Guid id);
 
-        public Task<string> ChangeRealizationValueById(Guid id, string newValue);
+        public Task<int> ChangeRealizationValueById(Guid id, string newValue);
 
         public Task<int> DeletePatternById(Guid patternId);
     }

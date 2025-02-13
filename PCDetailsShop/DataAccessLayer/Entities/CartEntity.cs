@@ -22,5 +22,6 @@ namespace DataAccessLayer.Entities
 
         // Навигационное свойство
         public List<ProductEntity> Products { get; set; }
+
     }
 }

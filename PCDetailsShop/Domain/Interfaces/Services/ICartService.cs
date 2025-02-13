@@ -16,8 +16,8 @@ namespace Domain.Interfaces.Services
 
         public Task<CollectionResult<Product>> BuyProductsAsync(Guid cartId);
 
-        public Task<BaseResult<decimal>> GetProductsSummCost(Guid cartId);
+        public Task<BaseResult<decimal>> GetProductsTotalPriceByIdAsync(Guid cartId);
 
-        public Task<BaseResult<float>> GetProductsSummWeight(Guid cartId);
+        public Task<BaseResult<float>> GetProductsTotalWeightAsync(Guid cartId);
     }
 }

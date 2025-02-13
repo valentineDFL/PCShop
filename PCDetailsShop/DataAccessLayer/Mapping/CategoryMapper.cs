@@ -1,50 +1,76 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DataAccessLayer.Entities;
+﻿using DataAccessLayer.Entities;
 using Domain.Models;
+using DataAccessLayer.Entities.Characteristic;
 
 namespace DataAccessLayer.Mapping
 {
-    internal class CategoryMapper
-    {
-        public CategoryEntity ModelToEntity(Category category)
-        {
-            CategoryEntity categoryEntity = new CategoryEntity()
-            {
-                Id = category.Id,
-                Name = category.Name,
-                Products = new List<ProductEntity>(),
-            };
+	internal class CategoryMapper
+	{
+		private readonly CharacteristicPatternMapper _characteristicPatternMapper;
 
-            return categoryEntity;
-        }
+		public CategoryMapper(CharacteristicPatternMapper characteristicPatternMapper)
+		{
+			_characteristicPatternMapper = characteristicPatternMapper;
+		}
 
-        public async Task<List<CategoryEntity>> ModelsToEntitiesAsync(List<Category> categories)
-        { 
-            List<CategoryEntity> result = new List<CategoryEntity>();
+		public Category EntityToModel(CategoryEntity categoryEntity)
+		{
+			if (categoryEntity == null) 
+				throw new ArgumentNullException($"Category Entity is null {nameof(EntityToModel)}");
 
-            await Task.Run(() => 
-            {
-                foreach (Category category in categories)
-                {
-                    result.Add(ModelToEntity(category));
-                }
-            });
+			return new Category
+				(
+					categoryEntity.Id,
+					categoryEntity.Name,
+					new List<Product>(),
+					_characteristicPatternMapper.EntitiesToModels(categoryEntity.CharacteristicPatterns)
+				);
+		}
 
-            return result;
-        }
+		public List<Category> EntitiesToModels(List<CategoryEntity> categoryEntities)
+		{
+			if (categoryEntities == null) 
+				throw new ArgumentNullException($"Category Entities is null {nameof(EntitiesToModels)}");
 
-        public Category EntityToModel(CategoryEntity categoryEntity)
-        {
-            throw new NotImplementedException();
-        }
+			List<Category> result = new List<Category>();
 
-        public Task<List<Category>> EntitiesToModelsAsync(List<CategoryEntity> categoryEntities)
-        {
-            throw new NotImplementedException();
-        }
-    }
+			foreach (CategoryEntity categoryEntity in categoryEntities)
+			{
+				result.Add(EntityToModel(categoryEntity));
+			}
+
+			return result;
+		}
+
+		public CategoryEntity ModelToEntity(Category category)
+		{
+			if (category == null)
+				throw new ArgumentNullException($"Category is null {nameof(ModelToEntity)}");
+
+			CategoryEntity categoryEntity = new CategoryEntity()
+			{
+				Id = category.Id,
+				Name = category.Name,
+				Products = new List<ProductEntity>(),
+				CharacteristicPatterns = _characteristicPatternMapper.ModelsToEntities(category.CharacteristicPatterns.ToList())
+			};
+
+			return categoryEntity;
+		}
+
+		public List<CategoryEntity> ModelsToEntities(List<Category> categories)
+		{
+			if (categories == null)
+				throw new ArgumentNullException($"Categories is null {nameof(ModelsToEntities)}");
+
+			List<CategoryEntity> result = new List<CategoryEntity>();
+
+			foreach (Category category in categories)
+			{
+				result.Add(ModelToEntity(category));
+			}
+
+			return result;
+		}
+	}
 }

@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Domain.Enums;
+using Domain.Models;
 
 namespace Domain.Interfaces.Repositories
 {
-    public class ICartRepository
+    public interface ICartRepository
     {
+        public Task<(Cart cart, ErrorCodes errorCode)> GetByIdAsync(Guid cartId);
+
+        public Task<Cart> CreateAsync(Cart cart);
+
+        public Task<int> UpdateCartByIdAsync(Guid cartId, Cart newCartData);
     }
 }

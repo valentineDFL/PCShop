@@ -1,14 +1,14 @@
 ﻿using Domain.Dto.UserDtos;
-using Domain.Interfaces.MappingW;
+using Domain.Interfaces.Mapping;
 using Domain.Models;
 using Domain.Result;
 using Microsoft.EntityFrameworkCore.Storage.Json;
 
 namespace PCDetailsShop.API.DtoMapping
 {
-    public class UserResponseDtoMapper : IBaseMapper<User, UserDto>
+    public class UserDtoMapper : IDtoMapper<User, UserDto>
     {
-        public BaseResult<UserDto> FromModelToDto(User user)
+        public BaseResult<UserDto> FromModelToDtoResult(User user)
         {
             return new BaseResult<UserDto>()
             {

@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
-using System.Threading.Tasks;
-using DataAccessLayer.Entities;
+﻿using DataAccessLayer.Entities;
 using DataAccessLayer.Mapping;
 using Domain.Enums;
 using Domain.Interfaces.Repositories;
 using Domain.Models;
-using Domain.Result;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccessLayer.Repositories
@@ -30,6 +22,9 @@ namespace DataAccessLayer.Repositories
         {
             List<UserEntity> entities = await _dbContext.Users.ToListAsync();
 
+            if (entities.Count == 0)
+                return new List<User>();
+
             List<User> users = await _userMapper.EntitiesToModelsAsync(entities);
 
             return users;
@@ -37,9 +32,6 @@ namespace DataAccessLayer.Repositories
 
         public async Task<User> CreateAsync(User user)
         {
-            if(user == null)
-                throw new ArgumentNullException($"User Null {nameof(CreateAsync)}");
-
             UserEntity entity = _userMapper.ModelToEntity(user);
 
             await _dbContext.Users.AddAsync(entity);
@@ -50,9 +42,6 @@ namespace DataAccessLayer.Repositories
 
         public async Task<int> DeleteAsync(Guid id)
         {
-            if(id == Guid.Empty)
-                throw new ArgumentException($"User id is Empty {nameof(DeleteAsync)}");
-
             int countRemovedUsers = await _dbContext.Users
                 .Where(u => u.Id == id)
                 .ExecuteDeleteAsync();
@@ -62,47 +51,47 @@ namespace DataAccessLayer.Repositories
             return countRemovedUsers;
         }
 
-        public async Task<User> GetByIdAsync(Guid id)
+        public async Task<(User User, ErrorCodes ErrorCode)> GetByIdAsync(Guid id)
         {
-            UserEntity user = await _dbContext.Users
+            UserEntity userEntity = await _dbContext.Users
                 .FirstOrDefaultAsync(p => p.Id == id);
 
-            User result = _userMapper.EntityToModel(user);
+            if(userEntity == null)
+                return (null, ErrorCodes.UserNotFound);
 
-            return result;
+            User result = _userMapper.EntityToModel(userEntity);
+
+            return (result, ErrorCodes.None);
         }
 
-        public async Task<User> GetByLoginAsync(string login)
+        public async Task<(User User, ErrorCodes ErrorCode)> GetByLoginAsync(string login)
         {
-            if(string.IsNullOrEmpty(login))
-                throw new ArgumentNullException($"User login Null or Empty {nameof(ChangeLoginAsync)}");
-
             UserEntity userEntity = await _dbContext.Users
                 .FirstOrDefaultAsync(u => u.Login == login);
 
-            User user = _userMapper.EntityToModel(userEntity);
+            if(userEntity == null)
+                return (null, ErrorCodes.UserNotFound);
 
-            return user;
+            User result = _userMapper.EntityToModel(userEntity);
+
+            return (result, ErrorCodes.None);
         }
 
-        public async Task<User> GetByEmailAsync(string email)
+        public async Task<(User User, ErrorCodes ErrorCode)> GetByEmailAsync(string email)
         {
-            if (string.IsNullOrEmpty(email))
-                throw new ArgumentNullException($"User Email Null or Empty {nameof(ChangeLoginAsync)}");
-
             UserEntity userEntity = await _dbContext.Users
                 .FirstOrDefaultAsync(u => u.Email == email);
 
-            User user = _userMapper.EntityToModel(userEntity);
+            if(userEntity == null)
+                return (null, ErrorCodes.UserNotFound);
 
-            return user;
+            User result = _userMapper.EntityToModel(userEntity);
+
+            return (result, ErrorCodes.None);
         }
 
         public async Task<int> ChangeLoginAsync(Guid id, string newLogin)
         {
-            if (string.IsNullOrEmpty(newLogin))
-                throw new ArgumentNullException($"User new login Null or Empty {nameof(ChangeLoginAsync)}");
-
             int updatedUsers = await _dbContext.Users
                 .Where(u => u.Id == id)
                 .ExecuteUpdateAsync(u => u
@@ -115,9 +104,6 @@ namespace DataAccessLayer.Repositories
 
         public async Task<int> ChangeEmailAsync(Guid id, string newEmail)
         {
-            if (string.IsNullOrEmpty(newEmail))
-                throw new ArgumentNullException($"User new email Null or Empty {nameof(ChangeEmailAsync)}");
-
             int updatedUsers = await _dbContext.Users
                 .Where(u => u.Id == id)
                 .ExecuteUpdateAsync(u => u
@@ -130,9 +116,6 @@ namespace DataAccessLayer.Repositories
 
         public async Task<int> ChangePasswordAsync(Guid id, string newPassword)
         {
-            if (string.IsNullOrEmpty(newPassword))
-                throw new ArgumentNullException($"User new password Null or Empty {nameof(ChangePasswordAsync)}");
-
             int updatedUsers = await _dbContext.Users
                 .Where(u => u.Id == id)
                 .ExecuteUpdateAsync(u => u
@@ -145,9 +128,6 @@ namespace DataAccessLayer.Repositories
 
         public async Task<int> AddMoneyToBalance(Guid id, decimal increaseSumm)
         {
-            if (increaseSumm <= 0)
-                throw new ArgumentNullException($"Increase Summ must be high than 0 {nameof(AddMoneyToBalance)}");
-
             int updatedUsers = await _dbContext.Users
                 .Where(u => u.Id == id)
                 .ExecuteUpdateAsync(u => u

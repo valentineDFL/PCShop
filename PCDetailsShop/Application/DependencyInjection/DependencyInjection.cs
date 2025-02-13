@@ -8,50 +8,26 @@ using Domain.Interfaces.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Domain.Interfaces.Validators;
 using Serilog;
-using Application.Validation.UserValidations;
 using FluentValidation;
 using Domain.Dto.UserDtos;
 using Domain.Interfaces.Encrypt;
 using Application.Encrypters;
 using Application.Validation.FluentValidations.UserFluent;
 using Domain.Dto.CategoryDtos;
+using Application.Validation.FluentValidations.CategoryFluent;
 
 namespace Application.DependencyInjection
 {
-    public static class DependencyInjection
-    {
-        public static void AddApplication(this IServiceCollection services)
-        {
-            services.AddScoped<IEncrypter, ShaEncrypter>();
+	public static class DependencyInjection
+	{
+		public static void AddApplication(this IServiceCollection services)
+		{
+			services.AddScoped<IEncrypter, ShaEncrypter>();
 
-            InitUserService(services);
-            //InitCartService(services);
-            //InitProductService(services);
-            //InitCategoryService(services);
-
-        }
-
-        private static void InitUserService(this IServiceCollection services)
-        {
-            services.AddScoped<IUserValidator, ChangeUserDataValidator>();
-            services.AddScoped<IValidator<CreateUserDto>, CreateUserValidator>();
-
-            services.AddScoped<IUserService, UserService>();
-        }
-
-        private static void InitCartService(this IServiceCollection services)
-        {
-
-        }
-
-        private static void InitProductService(this IServiceCollection services)
-        {
-
-        }
-
-        private static void InitCategoryService(this IServiceCollection services)
-        {
-            
-        }
-    }
+			services.AddScoped<IValidator<CreateUserDto>, CreateUserValidator>();
+			services.AddScoped<IValidator<CreateCategoryDto>, CreateCategoryValidator>();
+			services.AddScoped<IUserService, UserService>();
+			services.AddScoped<ICategoryService, CategoryService>();
+		}
+	}
 }

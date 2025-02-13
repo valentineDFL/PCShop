@@ -9,6 +9,8 @@ namespace Domain.Enums
     public enum ErrorCodes
     {
         InternalServerError = 0,
+        None = 1,
+
 
         UserNotFound = 11,
         UsersNotFound = 12,
@@ -33,12 +35,13 @@ namespace Domain.Enums
 
         CartNotFound = 31,
         CartsNotFound = 32,
-
+        CartDoesNotContainSelectedProduct = 33,
 
 
         ProductNotFound = 41,
         ProductsNotFound = 42,
         ProductAlreadyExists = 43,
+
 
 
         CategoryNotFound = 51,
@@ -52,5 +55,10 @@ namespace Domain.Enums
 
         CharacteristicNotFound = 61,
         CharacteristicsNotFound = 62,
+
+        CharacteristicWithTurnedNameAlreadyExists = 63,
+
+        CategoryDoesNotContainSelectedCharacteristic = 63,
+
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Enums;
 using Domain.Models;
 using Domain.Result;
 
@@ -12,11 +13,11 @@ namespace Domain.Interfaces.Repositories
     {
         public Task<List<User>> GetAllAsync();
 
-        public Task<User> GetByIdAsync(Guid id);
+        public Task<(User User, ErrorCodes ErrorCode)> GetByIdAsync(Guid id);
 
-        public Task<User> GetByLoginAsync(string name);
+        public Task<(User User, ErrorCodes ErrorCode)> GetByLoginAsync(string name);
 
-        public Task<User> GetByEmailAsync(string email);
+        public Task<(User User, ErrorCodes ErrorCode)> GetByEmailAsync(string email);
 
         public Task<User> CreateAsync(User user);
 

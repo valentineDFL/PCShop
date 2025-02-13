@@ -10,11 +10,10 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Host.UseSerilog((context, configuration) => configuration.ReadFrom.Configuration(context.Configuration));
 
-builder.Services.AddSwaggerGen();
 builder.Services.AddDtoMapping();
+builder.Services.AddSwaggerGen();
 builder.Services.AddDataAccessLayer(builder.Configuration);
 builder.Services.AddApplication();
-
 
 WebApplication app = builder.Build();
 
@@ -25,7 +24,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseRouting();
-
 app.UseHttpsRedirection();
 
 app.MapControllers();

@@ -23,7 +23,7 @@ namespace Domain.Result
             ErrorCode = errorCode;
             Data = data;
         }
-
+        
         public BaseResult() { }
 
         public T Data { get; set; }

@@ -12,6 +12,7 @@ using Domain.Models;
 using Domain.Result;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Microsoft.VisualBasic;
 
 namespace DataAccessLayer.Repositories
 {
@@ -26,33 +27,7 @@ namespace DataAccessLayer.Repositories
             _cartMapper = cartMapper;
         }
 
-        public async Task<CollectionResult<Cart>> GetAllAsync()
-        {
-            List<CartEntity> entities = await _dbContext.Carts
-                .AsNoTracking()
-                .Include(x => x.User)
-                .ToListAsync();
-
-            if(entities.Count == 0)
-            {
-                return new CollectionResult<Cart>()
-                {
-                    Count = 0,
-                    ErrorCode = (int)ErrorCodes.CartsNotFound,
-                    ErrorMessage = ErrorCodes.CartsNotFound.ToString()
-                };
-            }
-            
-            List<Cart> carts = await _cartMapper.EntitiesToModelsAsync(entities);
-            
-            return new CollectionResult<Cart>()
-            {
-                Count = carts.Count,
-                Data = carts,
-            };
-        }
-
-        public async Task<BaseResult<Cart>> GetByIdAsync(Guid id)
+        public async Task<(Cart cart, ErrorCodes errorCode)> GetByIdAsync(Guid id)
         {
             CartEntity cart = await _dbContext.Carts
                 .Include(x => x.Products)
@@ -61,82 +36,38 @@ namespace DataAccessLayer.Repositories
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == id);
 
-            if(cart == null)
-            {
-                return new BaseResult<Cart>()
-                {
-                    ErrorCode = (int)ErrorCodes.CartNotFound,
-                    ErrorMessage = ErrorCodes.CartNotFound.ToString()
-                };
-            }
+            if (cart == null)
+                return (null, ErrorCodes.CartNotFound);
 
             Cart result = await _cartMapper.EntityToModelAsync(cart);
 
-            return new BaseResult<Cart>() { Data = result };
+            return (result, ErrorCodes.None);
         }
 
-        public async Task<BaseResult<Cart>> CreateAsync(Cart cart)
+        public async Task<Cart> CreateAsync(Cart cart)
         {
-            if (cart == null)
-                throw new ArgumentNullException($"Cart null {nameof(CreateAsync)}");
-
             CartEntity entity = await _cartMapper.ModelToEntityAsync(cart);
 
             await _dbContext.Carts.AddAsync(entity);
             await _dbContext.SaveChangesAsync();
 
-            return new BaseResult<Cart>() { Data = cart };
+            return cart;
         }
 
-        public async Task<BaseResult<Guid>> DeleteAsync(Guid id)
+        public async Task<int> UpdateCartByIdAsync(Guid cartId, Cart newCartData)
         {
-            if(id == Guid.Empty)
-                throw new ArgumentException($"Cart id is Empty {nameof(DeleteAsync)}");
+            CartEntity mappedCart = await _cartMapper.ModelToEntityAsync(newCartData);
 
-            int countDeletedCarts = await _dbContext.Carts
-                .Where(c => c.Id == id)
-                .ExecuteDeleteAsync();
-
-            if (countDeletedCarts == 0)
-            {
-                return new BaseResult<Guid> 
-                {
-                    ErrorCode = (int)ErrorCodes.CartNotFound,
-                    ErrorMessage = ErrorCodes.CartNotFound.ToString()
-                };
-            }
-
-            await _dbContext.SaveChangesAsync();
-
-            return new BaseResult<Guid>() { Data = id };
-        }
-
-        public async Task<BaseResult<Cart>> UpdateAsync(Cart cart)
-        {
-            if (cart == null)
-                throw new ArgumentNullException($"Cart null {nameof(UpdateAsync)}");
-
-            CartEntity entity = await _cartMapper.ModelToEntityAsync(cart);
-
-            int updatedCartsCount = await _dbContext.Carts
-                .Where(c => c.Id == entity.Id)
+            int updatedCarts = await _dbContext.Carts
+                .Where(c => c.Id == cartId)
                 .ExecuteUpdateAsync(c => c
-                .SetProperty(p => p.CartTotalPrice, entity.CartTotalPrice)
-                .SetProperty(p => p.CartTotalWeight, entity.CartTotalWeight)
-                .SetProperty(p => p.Products, entity.Products));
-
-            if(updatedCartsCount == 0)
-            {
-                return new BaseResult<Cart>()
-                {
-                    ErrorCode = (int)ErrorCodes.CartNotFound,
-                    ErrorMessage = ErrorCodes.CartNotFound.ToString()
-                };
-            }
+                .SetProperty(c => c.Products, mappedCart.Products)
+                .SetProperty(c => c.CartTotalPrice, mappedCart.CartTotalPrice)
+                .SetProperty(c => c.CartTotalWeight, mappedCart.CartTotalWeight));
 
             await _dbContext.SaveChangesAsync();
 
-            return new BaseResult<Cart>() { Data = cart };
+            return updatedCarts;
         }
     }
 }
