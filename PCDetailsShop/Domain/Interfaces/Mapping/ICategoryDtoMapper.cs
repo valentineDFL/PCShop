@@ -7,7 +7,7 @@ namespace Domain.Interfaces.Mapping;
 
 public interface ICategoryDtoMapper
 {
-    public Task<BaseResult<CategoryDto>> FromModelToDtoResultAsync(Category model);
+    public Task<BaseResult<CategoryResponseDto>> FromModelToDtoResultAsync(Category model);
 
-    public Task<CollectionResult<CategoryDto>> FromModelsToDtosAsync(List<Category> models);
+    public Task<CollectionResult<CategoryResponseDto>> FromModelsToDtosAsync(List<Category> models);
 }

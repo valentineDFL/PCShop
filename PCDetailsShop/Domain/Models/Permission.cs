@@ -4,12 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataAccessLayer.Entities.Characteristic
+namespace Domain.Models
 {
-    internal class CharacteristicPatternEntity
+    public class Permission
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         public string Name { get; set; }
+
+        public List<Role> Roles { get; private set; }
     }
 }

@@ -8,6 +8,7 @@ using Domain.Models;
 using Domain.Result;
 using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
@@ -15,6 +16,7 @@ using Microsoft.OpenApi.Models;
 namespace PCDetailsShop.API.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("[controller]")]
 public class CategoriesController : ControllerBase
 {
@@ -34,13 +36,13 @@ public class CategoriesController : ControllerBase
 	}
 
 	[HttpGet]
-	public async Task<ActionResult<CollectionResult<CategoryDto>>> GetAllAsync()
+	public async Task<ActionResult<CollectionResult<CategoryResponseDto>>> GetAllAsync()
 	{
 		CollectionResult<Category> response = await _categoryService.GetAllAsync();
 
 		if(response.IsSuccess)
 		{
-			CollectionResult<CategoryDto> mappedCategories = await _categoryDtoMapper.FromModelsToDtosAsync(response.Data.ToList());
+			CollectionResult<CategoryResponseDto> mappedCategories = await _categoryDtoMapper.FromModelsToDtosAsync(response.Data);
 			return Ok(mappedCategories);
 		}
 
@@ -48,13 +50,13 @@ public class CategoriesController : ControllerBase
 	}
 
 	[HttpGet("{id:guid}")]
-	public async Task<ActionResult<CategoryDto>> GetByIdAsync(Guid id)
+	public async Task<ActionResult<CategoryResponseDto>> GetByIdAsync(Guid id)
 	{
 		BaseResult<Category> response = await _categoryService.GetByIdAsync(id);
 
 		if(response.IsSuccess)
 		{
-			BaseResult<CategoryDto> mappedCategory = await _categoryDtoMapper.FromModelToDtoResultAsync(response.Data);
+			BaseResult<CategoryResponseDto> mappedCategory = await _categoryDtoMapper.FromModelToDtoResultAsync(response.Data);
 			return Ok(mappedCategory);
 		}
 
@@ -62,32 +64,48 @@ public class CategoriesController : ControllerBase
 	}
 
 	[HttpGet("[controller]/{name}")]
-	public async Task<ActionResult<CollectionResult<CategoryDto>>> GetByNameAsync(string name)
+	public async Task<ActionResult<BaseResult<CategoryResponseDto>>> GetByNameAsync(string name)
 	{
-		CollectionResult<Category> response = await _categoryService.GetByNameAsync(name);
+		BaseResult<Category> response = await _categoryService.GetByNameAsync(name);
 
 		if(response.IsSuccess)
 		{
-			CollectionResult<CategoryDto> mappedCategories = await _categoryDtoMapper.FromModelsToDtosAsync(response.Data.ToList());
+			BaseResult<CategoryResponseDto> mappedCategories = await _categoryDtoMapper.FromModelToDtoResultAsync(response.Data);
 			return Ok(mappedCategories);
 		}
 
 		return BadRequest(response);
 	}
 
+	[HttpGet("characteristicPatterns/{id:guid}")]
+	public async Task<ActionResult<CollectionResult<CharacteristicPatternDto>>> GetCategoryCharacteristicsByIdAsync(Guid id)
+	{
+		BaseResult<Category> response = await _categoryService.GetByIdAsync(id);
+
+		if(response.IsSuccess)
+		{
+			CollectionResult<CharacteristicPatternDto> mappedCharacteristics = await _characteristicPatternDtoMapper
+			.FromModelsToDtosAsync(response.Data.CharacteristicPatterns.ToList());
+
+			return Ok(mappedCharacteristics);
+		}
+
+		return BadRequest(response);
+	}
+
 	[HttpPost]
-	public async Task<ActionResult<BaseResult<CategoryDto>>> CreateAsync(CreateCategoryDto createCategoryDto)
+	public async Task<ActionResult<BaseResult<CategoryResponseDto>>> CreateAsync(CreateCategoryDto createCategoryDto)
 	{
 		ValidationResult createValidationResult = await _createCategoryValidator.ValidateAsync(createCategoryDto);
 		
 		if(!createValidationResult.IsValid)
-		    return BadRequest(createValidationResult);
+			return BadRequest(createValidationResult);
 		
 		BaseResult<Category> response = await _categoryService.CreateAsync(createCategoryDto);
 
 		if(response.IsSuccess)
 		{
-			BaseResult<CategoryDto> mappedCategory = await _categoryDtoMapper.FromModelToDtoResultAsync(response.Data);
+			BaseResult<CategoryResponseDto> mappedCategory = await _categoryDtoMapper.FromModelToDtoResultAsync(response.Data);
 			return Ok(mappedCategory);
 		}
 		
@@ -112,22 +130,6 @@ public class CategoriesController : ControllerBase
 
 		if(response.IsSuccess)
 			return Ok(response.Data);
-
-		return BadRequest(response);
-	}
-
-	[HttpGet("characteristicPatterns/{id:guid}")]
-	public async Task<ActionResult<CollectionResult<CharacteristicPatternDto>>> GetCategoryCharacteristicsByIdAsync(Guid id)
-	{
-		BaseResult<Category> response = await _categoryService.GetByIdAsync(id);
-
-		if(response.IsSuccess)
-		{
-			CollectionResult<CharacteristicPatternDto> mappedCharacteristics = await _characteristicPatternDtoMapper
-			.FromModelsToDtosAsync(response.Data.CharacteristicPatterns.ToList());
-
-			return Ok(mappedCharacteristics);
-		}
 
 		return BadRequest(response);
 	}

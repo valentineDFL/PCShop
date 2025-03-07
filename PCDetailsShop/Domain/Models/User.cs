@@ -1,8 +1,11 @@
-﻿
+﻿using System;
+
 namespace Domain.Models
 {
     public class User
     {
+        public User() { }
+
         public User(Guid id, string login, string email, string password, decimal walletBalance, 
             DateTime birthDate, DateTime registrationDate, Cart cart, Guid cartId)
         {
@@ -17,24 +20,26 @@ namespace Domain.Models
             CartId = cartId;
         }
 
-        public Guid Id { get; }
+        public Guid Id { get; private set; }
 
-        public string Login { get; }
+        public string Login { get; private set; }
 
-        public string Email { get; }
+        public string Email { get; private set; }
+        
+        public string Password { get; private set; }
 
-        public string Password { get; }
+        public decimal WalletBalance { get; private set; }
 
-        public decimal WalletBalance { get; }
+        public DateTime BirthDate { get; private set; }
 
-        public DateTime BirthDate { get; }
-
-        public DateTime RegistrationDate { get; }
-
+        public DateTime RegistrationDate { get; private set; }
+        
         // Навигационное свойство
-        public Cart Cart { get; }
+        public Cart Cart { get; private set; }
 
         // Внешний ключ
-        public Guid CartId { get; }
+        public Guid CartId { get; private set; }
+
+        public List<Role> Roles { get; private set; }
     }
 }

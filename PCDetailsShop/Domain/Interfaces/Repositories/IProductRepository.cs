@@ -3,33 +3,41 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Dto.CategoryDto;
+using Domain.Enums;
 using Domain.Models;
 using Domain.Result;
 
 namespace Domain.Interfaces.Repositories
 {
-    public interface IProductRepository
-    {
-        public Task<List<Product>> GetAllAsync();
+	public interface IProductRepository
+	{
+		public Task<List<Product>> GetAllAsync();
 
-        public Task<Product> GetByIdAsync(Guid id);
+		public Task<(Product product, ErrorCodes errorCode)> GetByIdAsync(Guid id);
 
-        public Task<Product> GetByNameAsync(string namePart);
+		public Task<List<Product>> GetByNamePartAsync(string namePart);
 
-        public Task<Product> CreateAsync(Product product);
+		public Task<(Product product, ErrorCodes errorCode)> GetByNameAsync(string name);
 
-        public Task<string> ChangeNameAsync(string newName);
+        public Task<List<Product>> GetByCategoriesNamesAsync(string[] categories, int countPerPage, int page);
 
-        public Task<string> ChangeDescriptionAsync(string newDescription);
-
-        public Task<decimal> ChangePriceAsync(decimal newPrice);
-
-        public Task<float> ChangeWeightAsync(float newWeight);
-
-        public Task<Category> AddCategoryToProductAsync(Guid priductId, Guid categoryId);
-
-        public Task<Category> DeleteCategoryFromProductAsync(Guid priductId, Guid categoryId);
+		public Task<Product> CreateAsync(Product product);
 
         public Task<int> DeleteByIdAsync(Guid id);
+
+		public Task<int> ChangeNameAsync(Guid id, string newName);
+
+		public Task<int> ChangeDescriptionAsync(Guid id, string description);
+
+        public Task<int> ChangePriceAsync(Guid id, decimal newPrice);
+
+        public Task<int> ChangeWeightAsync(Guid id, float newWeight);
+
+        public Task<int> ChangeProductCountAsync(Guid id, int newCount);
+
+		public Task<(Category category, ErrorCodes errorCode)> AddCategoryToProductAsync(Product product, Category categoryToAdd, List<CharacteristicRealization> realizations);
+
+		public Task<(Category category, ErrorCodes errorCode)> RemoveCategoryFromProduct(Guid productId, Category categoryToRemove);
     }
 }

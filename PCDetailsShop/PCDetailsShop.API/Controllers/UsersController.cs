@@ -6,49 +6,28 @@ using Domain.Models;
 using Domain.Result;
 using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace PCDetailsShop.API.Controllers
 {
     [ApiController]
-    [Route("users")]
+    [Route("[Controller]")]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IValidator<CreateUserDto> _createUserValidator;
         private readonly IDtoMapper<User, UserDto> _userDtoMapper;
 
-        public UsersController(IUserService userService, IValidator<CreateUserDto> createUserValidator,
-            IDtoMapper<User, UserDto> userDtoMapper)
+        public UsersController(IUserService userService, IDtoMapper<User, UserDto> userDtoMapper)
         {
             _userService = userService;
-            _createUserValidator = createUserValidator;
             _userDtoMapper = userDtoMapper;
-        }
-
-        [HttpPost("")]
-        public async Task<ActionResult<BaseResult<UserDto>>> CreateUserAsync(CreateUserDto dto)
-        {
-            ValidationResult validationResult = await _createUserValidator.ValidateAsync(dto);
-
-            if (!validationResult.IsValid)
-                return BadRequest(validationResult);
-
-            BaseResult<User> response = await _userService.CreateUserAsync(dto);
-
-            if (response.IsSuccess)
-            {
-                BaseResult<UserDto> result = _userDtoMapper.FromModelToDtoResult(response.Data);
-                return Ok(result);
-            }
-
-            return BadRequest(response);
         }
 
         [HttpDelete("{id:guid}")]
         public async Task<ActionResult<BaseResult<Guid>>> DeleteUserByIdAsync(Guid id)
         {
-            BaseResult<Guid> response = await _userService.DeleteUserByIdAsync(id);
+            BaseResult<Guid> response = await _userService.DeleteByIdAsync(id);
 
             if (response.IsSuccess)
                 return Ok(response);
@@ -59,7 +38,7 @@ namespace PCDetailsShop.API.Controllers
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<BaseResult<UserDto>>> GetUserById(Guid id)
         {
-            BaseResult<User> response = await _userService.GetUserByIdAsync(id);
+            BaseResult<User> response = await _userService.GetByIdAsync(id);
 
             if (response.IsSuccess)
             {
@@ -71,13 +50,14 @@ namespace PCDetailsShop.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = nameof(Roles.Admin))]
         public async Task<ActionResult<CollectionResult<UserDto>>> GetAllUsersAsync()
         {
-            CollectionResult<User> response = await _userService.GetAllUsersAsync();
+            CollectionResult<User> response = await _userService.GetAllAsync();
 
             if (response.IsSuccess)
             {
-                CollectionResult<UserDto> result = await _userDtoMapper.FromModelsToDtosAsync((List<User>)response.Data);
+                CollectionResult<UserDto> result = await _userDtoMapper.FromModelsToDtosAsync(response.Data);
                 return Ok(result);
             }
 
@@ -87,7 +67,7 @@ namespace PCDetailsShop.API.Controllers
         [HttpGet("{name}")]
         public async Task<ActionResult<CollectionResult<UserDto>>> GetUserByNameAsync(string name)
         {
-            BaseResult<User> response = await _userService.GetUserByNameAsync(name);
+            BaseResult<User> response = await _userService.GetByNameAsync(name);
 
             if (response.IsSuccess)
             {
@@ -101,7 +81,7 @@ namespace PCDetailsShop.API.Controllers
         [HttpPut("{id:guid}/change-login")]
         public async Task<ActionResult<BaseResult<string>>> ChangeUserLoginByIdAsync(Guid id, string newLogin)
         {
-            BaseResult<string> response = await _userService.ChangeUserLoginAsync(id, newLogin);
+            BaseResult<string> response = await _userService.ChangeLoginAsync(id, newLogin);
 
             if (response.IsSuccess)
                 return Ok(response);
@@ -112,7 +92,7 @@ namespace PCDetailsShop.API.Controllers
         [HttpPut("{id:guid}/change-email")]
         public async Task<ActionResult<BaseResult<string>>> ChangeUserEmailByIdAsync(Guid id, string newEmail)
         {
-            BaseResult<string> response = await _userService.ChangeUserEmailAsync(id, newEmail);
+            BaseResult<string> response = await _userService.ChangeEmailAsync(id, newEmail);
 
             if (response.IsSuccess)
                 return Ok(response);
@@ -123,7 +103,7 @@ namespace PCDetailsShop.API.Controllers
         [HttpPut("{id:guid}/change-password")]
         public async Task<ActionResult<BaseResult<string>>> ChangeUserPasswordByIdAsync(Guid id, string oldPassword, string newPassword)
         {
-            BaseResult<string> response = await _userService.ChangeUserPasswordAsync(id, oldPassword, newPassword);
+            BaseResult<string> response = await _userService.ChangePasswordAsync(id, oldPassword, newPassword);
 
             if (response.IsSuccess)
                 return Ok(response);

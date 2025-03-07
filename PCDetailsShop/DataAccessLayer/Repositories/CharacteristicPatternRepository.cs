@@ -4,9 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using DataAccessLayer.Entities;
-using DataAccessLayer.Entities.Characteristic;
-using DataAccessLayer.Mapping;
 using Domain.Interfaces.Repositories;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
@@ -16,44 +13,10 @@ namespace DataAccessLayer.Repositories
 	class CharacteristicPatternRepository : ICharacteristicPatternRepository
 	{
 		private readonly PcShopDbContext _dbContext;
-		private readonly CharacteristicPatternMapper _characteristicPatternMapper;
 
-		public CharacteristicPatternRepository(PcShopDbContext dbContext, CharacteristicPatternMapper characteristicPatternMapper)
+		public CharacteristicPatternRepository(PcShopDbContext dbContext)
 		{
 			_dbContext = dbContext;
-			_characteristicPatternMapper = characteristicPatternMapper;
-		}
-
-		public async Task<CharacteristicPattern> GetByIdAsync(Guid id)
-		{
-			CharacteristicPatternEntity characteristicPatternEntity = await _dbContext.CharacteristicPatterns
-				.FirstOrDefaultAsync(c => c.Id == id);
-
-			if (characteristicPatternEntity == null)
-				return new CharacteristicPattern();
-
-			return _characteristicPatternMapper.EntityToModel(characteristicPatternEntity);
-		}
-
-		public async Task<CharacteristicPattern> GetByNameAsync(string name)
-		{
-			CharacteristicPatternEntity characteristicPatternEntity = await _dbContext.CharacteristicPatterns
-				.FirstOrDefaultAsync(c => c.Name == name);
-
-			if (characteristicPatternEntity == null)
-				return new CharacteristicPattern();
-
-			return _characteristicPatternMapper.EntityToModel(characteristicPatternEntity);
-		}
-
-		public async Task<List<CharacteristicPattern>> CreateAsync(List<CharacteristicPattern> patternsToCreate)
-		{
-			List<CharacteristicPatternEntity> patternsToCreateEntities = _characteristicPatternMapper.ModelsToEntities(patternsToCreate);
-
-			await _dbContext.CharacteristicPatterns.AddRangeAsync(patternsToCreateEntities);
-			await _dbContext.SaveChangesAsync();
-
-			return patternsToCreate;
 		}
 
 		public async Task<int> ChangeNameAsync(Guid patternId, string newName)
@@ -79,7 +42,7 @@ namespace DataAccessLayer.Repositories
 
 		public async Task<int> DeleteCategoryPatternsByCategoryIdAsync(Guid categoryId)
 		{
-			CategoryEntity patternsOwner = await _dbContext.Categories
+			Category patternsOwner = await _dbContext.Categories
 				.Include(p => p.CharacteristicPatterns)
 				.FirstOrDefaultAsync(c => c.Id == categoryId);
 				

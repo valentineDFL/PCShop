@@ -4,8 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using DataAccessLayer.Entities;
-using DataAccessLayer.Entities.Characteristic;
+using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccessLayer
@@ -17,17 +16,21 @@ namespace DataAccessLayer
             Database.EnsureCreated();
         }
 
-        public DbSet<UserEntity> Users { get; set; }
+        public DbSet<User> Users { get; set; }
 
-        public DbSet<CartEntity> Carts { get; set; }
+        public DbSet<Cart> Carts { get; set; }
 
-        public DbSet<ProductEntity> Products { get; set; }
+        public DbSet<Product> Products { get; set; }
 
-        public DbSet<CategoryEntity> Categories { get; set; }
+        public DbSet<Category> Categories { get; set; }
 
-        public DbSet<CharacteristicPatternEntity> CharacteristicPatterns { get; set; }
+        public DbSet<CharacteristicPattern> CharacteristicPatterns { get; set; }
 
-        public DbSet<CharacteristicRealizationEntity> CharacteristicRealizing { get; set; }
+        public DbSet<CharacteristicRealization> CharacteristicRealizations { get; set; }
+
+        public DbSet<Role> Roles { get; set; }
+
+        public DbSet<Permission> Permissions { get; set; } 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

@@ -28,6 +28,8 @@ namespace Application.DependencyInjection
 			services.AddScoped<IValidator<CreateCategoryDto>, CreateCategoryValidator>();
 			services.AddScoped<IUserService, UserService>();
 			services.AddScoped<ICategoryService, CategoryService>();
+			services.AddScoped<IProductService, ProductService>();
+			services.AddScoped<ICartService, CartService>();
 		}
 	}
 }

@@ -1,12 +1,12 @@
-﻿using DataAccessLayer.Entities;
+﻿using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DataAccessLayer.Configurations
 {
-    internal class ProductConfiguration : IEntityTypeConfiguration<ProductEntity>
+    internal class ProductConfiguration : IEntityTypeConfiguration<Product>
     {
-        public void Configure(EntityTypeBuilder<ProductEntity> builder)
+        public void Configure(EntityTypeBuilder<Product> builder)
         {
             builder.HasKey(p => p.Id);
 
@@ -19,7 +19,8 @@ namespace DataAccessLayer.Configurations
                 .HasMaxLength(2048);
 
             builder.HasMany(p => p.CharacteristicsRealizations)
-                .WithMany();
+                .WithOne(cr => cr.Product)
+                .HasForeignKey(cr => cr.ProductId);
         }
     }
 }

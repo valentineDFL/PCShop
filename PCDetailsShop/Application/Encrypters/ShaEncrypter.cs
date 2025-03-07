@@ -4,7 +4,6 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using DataAccessLayer.Migrations;
 using Domain.Interfaces.Encrypt;
 
 namespace Application.Encrypters

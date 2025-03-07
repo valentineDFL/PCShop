@@ -12,9 +12,11 @@ namespace Domain.Interfaces.Services
     {
         public Task<CollectionResult<Product>> GetAllProductsInCartAsync(Guid cartId);
 
-        public Task<BaseResult<Product>> RemoveProductFromCartByIdAsync(Guid cartId, Guid productId);
+        public Task<BaseResult<Product>> GetProductFromCartByNameAsync(Guid cartId, string productName);
 
-        public Task<CollectionResult<Product>> BuyProductsAsync(Guid cartId);
+        public Task<BaseResult<Guid>> RemoveProductFromCartByIdAsync(Guid cartId, Guid productId);
+
+        public Task<BaseResult<int>> BuyProductsAsync(Guid cartId);
 
         public Task<BaseResult<decimal>> GetProductsTotalPriceByIdAsync(Guid cartId);
 

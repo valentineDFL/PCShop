@@ -16,7 +16,9 @@ namespace Domain.Interfaces.Repositories
         
         public Task<(Category category, ErrorCodes errorCode)> GetByIdAsync(Guid id);
 
-        public Task<List<Category>> GetByNameAsync(string name);
+        public Task<(Category category, ErrorCodes errorCode)> GetByNameAsync(string name);
+
+        public Task<List<Category>> GetByNamesAsync(List<string> categoriesNames);
 
         public Task<Category> CreateAsync(Category category);
 

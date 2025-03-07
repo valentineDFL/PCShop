@@ -1,13 +1,14 @@
-﻿using Domain.Models;
+﻿using Domain.Enums;
+using Domain.Models;
 
 namespace Domain.Interfaces.Repositories
 {
-    public interface ICharacteristicRealizeRepository
+    public interface ICharacteristicRealizationRepository
     {
-        public Task<CharacteristicRealization> GetByIdAsync(Guid id);
+        public Task<int> ChangeRealizationValueByIdAsync(Guid id, string newValue);
 
-        public Task<int> ChangeRealizationValueById(Guid id, string newValue);
+        public Task<int> DeleteRealizationsAsync(List<CharacteristicRealization> realizations);
 
-        public Task<int> DeletePatternById(Guid patternId);
+        public Task<List<CharacteristicRealization>> CreateRangeAsync(List<CharacteristicRealization> realizations);
     }
 }

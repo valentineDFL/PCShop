@@ -18,13 +18,10 @@ namespace Application.Services
 		private readonly ICategoryRepository _categoryRepository;
 		private readonly ICharacteristicPatternRepository _characteristicPatternRepository;
 
-		private readonly ILogger _logger;
-
-		public CategoryService(ICategoryRepository categoryRepository, ICharacteristicPatternRepository characteristicPatternRepository, ILogger logger)
+		public CategoryService(ICategoryRepository categoryRepository, ICharacteristicPatternRepository characteristicPatternRepository)
 		{
 			_categoryRepository = categoryRepository;
 			_characteristicPatternRepository = characteristicPatternRepository;
-			_logger = logger;
 		}
 
 		public async Task<CollectionResult<Category>> GetAllAsync()
@@ -33,8 +30,6 @@ namespace Application.Services
 
 			if(categories.Count == 0)
 			{
-				_logger.Warning(ErrorCodes.CategoriesNotFound.ToString());
-
 				return new CollectionResult<Category>()
 				{
 					ErrorCode = (int)ErrorCodes.CategoriesNotFound,
@@ -61,29 +56,27 @@ namespace Application.Services
 			return new BaseResult<Category>() { Data = findedCategory.category };
 		}
 
-		public async Task<CollectionResult<Category>> GetByNameAsync(string name)
+		public async Task<BaseResult<Category>> GetByNameAsync(string name)
 		{
-			List<Category> categories = await _categoryRepository.GetByNameAsync(name);
+			(Category category, ErrorCodes errorCode) findedCategory = await _categoryRepository.GetByNameAsync(name);
 
-			if (categories.Count == 0)
+			if (findedCategory.errorCode != ErrorCodes.None)
 			{
-				_logger.Warning(ErrorCodes.CategoriesNotFound.ToString());
-
-				return new CollectionResult<Category>()
+				return new BaseResult<Category>()
 				{
 					ErrorCode = (int)ErrorCodes.CategoryNotFound,
 					ErrorMessage = ErrorCodes.CategoryNotFound.ToString(),
 				};
 			}
 
-			return new CollectionResult<Category>() { Count = categories.Count, Data = categories };
+			return new BaseResult<Category>() { Data = findedCategory.category };
 		}
 
 		public async Task<BaseResult<Category>> CreateAsync(CreateCategoryDto dto)
 		{
-			List<Category> categoryWithTurnedName = await _categoryRepository.GetByNameAsync(dto.Name);
+			(Category category, ErrorCodes errorCode) findedCategory = await _categoryRepository.GetByNameAsync(dto.Name);
 
-			if(categoryWithTurnedName.Count != 0)
+			if(findedCategory.errorCode == ErrorCodes.None)
 			{
 				return new BaseResult<Category>()
 				{
@@ -94,7 +87,7 @@ namespace Application.Services
 			
 			Guid categoryId = Guid.NewGuid();
 
-			List<CharacteristicPattern> characteristicPatterns = CreatePatterns(dto.CharacteristicsToCreate);
+			List<CharacteristicPattern> characteristicPatterns = CreatePatterns(dto.CharacteristicsToCreate, categoryId);
 
 			Category categoryToCreate = new Category(categoryId, dto.Name, new List<Product>(), characteristicPatterns);
 			
@@ -103,12 +96,12 @@ namespace Application.Services
 			return new BaseResult<Category>() { Data = createdCategory };
 		}
 
-		private List<CharacteristicPattern> CreatePatterns(List<CharacteristicPatternCreateDto> patternsToCreate)
+		private List<CharacteristicPattern> CreatePatterns(List<CharacteristicPatternCreateDto> patternsToCreate, Guid categoryId)
 		{
 			List<CharacteristicPattern> characteristics = new List<CharacteristicPattern>();
 
 			for (int index = 0; index < patternsToCreate.Count; index++)
-				characteristics.Add(new CharacteristicPattern(Guid.NewGuid(), patternsToCreate[index].Name));
+				characteristics.Add(new CharacteristicPattern(Guid.NewGuid(), patternsToCreate[index].Name, categoryId, null, new List<CharacteristicRealization>()));
 
 			return characteristics;
 		}
@@ -133,9 +126,9 @@ namespace Application.Services
 
 		public async Task<BaseResult<string>> ChangeNameByIdAsync(Guid categoryId, string newName)
 		{
-			List<Category> categoriesWithTurnedNewName = await _categoryRepository.GetByNameAsync(newName);
+			(Category category, ErrorCodes errorCode) findedCategory = await _categoryRepository.GetByNameAsync(newName);
 
-			if(categoriesWithTurnedNewName.Count != 0)
+			if(findedCategory.errorCode == ErrorCodes.None)
 			{
 				return new BaseResult<string>()
 				{
@@ -183,8 +176,8 @@ namespace Application.Services
 			return new CollectionResult<CharacteristicPattern>() 
 			{ 
 				Count = findedCategory.category.CharacteristicPatterns.Count, 
-				Data = findedCategory.category.CharacteristicPatterns 
-			};
+				Data = (List<CharacteristicPattern>)findedCategory.category.CharacteristicPatterns
+            };
 		}
 
 		public async Task<BaseResult<string>> ChangeCharacteristicNameByNameAsync(Guid categoryId, string characteristicPatternName, string newCharacteristicPatternName)

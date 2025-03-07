@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Dto.CategoryDtos
+namespace Domain.Dto.UserDto
 {
-    public record UpdateCategoryDto(Guid id, string Name);
+    public record LoginUserDto(string Email, string Password);
 }

@@ -8,21 +8,31 @@ namespace Domain.Models
 {
     public class CharacteristicRealization
     {
-        public CharacteristicRealization(Guid id, string value, 
-            Guid characteristicPatternId, CharacteristicPattern characteristicPattern)
+        public CharacteristicRealization() { }
+
+        public CharacteristicRealization(Guid id, string value, Guid characteristicPatternId, 
+            CharacteristicPattern characteristicPattern, Guid productId, Product product)
         {
             Id = id;
             Value = value;
             CharacteristicPatternId = characteristicPatternId;
             CharacteristicPattern = characteristicPattern;
+            ProductId = productId;
+            Product = product;
         }
 
-        public Guid Id { get; }
+        public Guid Id { get; private set; }
 
-        public string Value { get; }
+        public string Value { get; private set; }
 
-        public Guid CharacteristicPatternId { get; }
+        // ссылка
+        public Guid CharacteristicPatternId { get; private set; }
 
-        public CharacteristicPattern CharacteristicPattern { get; }
+        // навигационное свойство
+        public CharacteristicPattern CharacteristicPattern { get; private set; }
+
+        public Guid ProductId { get; private set; }
+
+        public Product Product { get; private set; }
     }
 }

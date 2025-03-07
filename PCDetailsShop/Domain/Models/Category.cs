@@ -8,8 +8,9 @@ namespace Domain.Models
 {
     public class Category
     {
-        public Category(Guid id, string name, IReadOnlyList<Product> products,
-            List<CharacteristicPattern> characteristicPatterns)
+        public Category() { }
+
+        public Category(Guid id, string name, List<Product> products, List<CharacteristicPattern> characteristicPatterns)
         {
             Id = id;
             Name = name;
@@ -17,12 +18,12 @@ namespace Domain.Models
             CharacteristicPatterns = characteristicPatterns;
         }
 
-        public Guid Id { get; }
+        public Guid Id { get; private set; }
 
-        public string Name { get; }
+        public string Name { get; private set; }
 
-        public IReadOnlyList<Product> Products { get; }
+        public List<Product> Products { get; private set; }
 
-        public IReadOnlyList<CharacteristicPattern> CharacteristicPatterns { get; }
+        public List<CharacteristicPattern> CharacteristicPatterns { get; private set; }
     }
 }

@@ -19,33 +19,33 @@ public class CategoryDtoMapper : ICategoryDtoMapper
         _characteristicPatternMapper = characteristicDtoMapper;
     }
 
-    public async Task<BaseResult<CategoryDto>> FromModelToDtoResultAsync(Category model)
+    public async Task<BaseResult<CategoryResponseDto>> FromModelToDtoResultAsync(Category model)
     {
         CollectionResult<CharacteristicPatternDto> mappedCharacteristics = await _characteristicPatternMapper
         .FromModelsToDtosAsync(model.CharacteristicPatterns.ToList());
 
-        CategoryDto result = new CategoryDto(model.Name, mappedCharacteristics.Data.ToList());
+        CategoryResponseDto result = new CategoryResponseDto(model.Name, mappedCharacteristics.Data.ToList());
 
-        return new BaseResult<CategoryDto>() { Data = result };
+        return new BaseResult<CategoryResponseDto>() { Data = result };
     }
 
-    private async Task<CategoryDto> FromModelToDtoAsync(Category model)
+    private async Task<CategoryResponseDto> FromModelToDtoAsync(Category model)
     {
         CollectionResult<CharacteristicPatternDto> mappedCharacteristics = await _characteristicPatternMapper
             .FromModelsToDtosAsync(model.CharacteristicPatterns.ToList());
 
-        return new CategoryDto(model.Name, mappedCharacteristics.Data.ToList());
+        return new CategoryResponseDto(model.Name, mappedCharacteristics.Data.ToList());
     }
 
-    public async Task<CollectionResult<CategoryDto>> FromModelsToDtosAsync(List<Category> models)
+    public async Task<CollectionResult<CategoryResponseDto>> FromModelsToDtosAsync(List<Category> models)
     {
-        List<CategoryDto> mappedCharacteristics = new List<CategoryDto>();
+        List<CategoryResponseDto> mappedCharacteristics = new List<CategoryResponseDto>();
 
         foreach(Category model in models)
         {
             mappedCharacteristics.Add(await FromModelToDtoAsync(model));
         }
 
-        return new CollectionResult<CategoryDto>() { Count = mappedCharacteristics.Count, Data = mappedCharacteristics };
+        return new CollectionResult<CategoryResponseDto>() { Count = mappedCharacteristics.Count, Data = mappedCharacteristics };
     }
 }

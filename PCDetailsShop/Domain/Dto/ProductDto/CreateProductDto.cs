@@ -9,5 +9,9 @@ using Domain.Models;
 
 namespace Domain.Dto.ProductDtos
 {
-    public record CreateProductDto(string Name, string Description, decimal Price, float Weight, List<Category> Categories);
+    public record CreateProductDto(string Name, string Description, decimal Price, float Weight, List<CategoryDto.CategoryDto> Categories,
+     List<List<CharacteristicRealizationCreateDto>> characteristicsRealizations);
+
+
+     // must have Category Patterns count * Categories Count
 }

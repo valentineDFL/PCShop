@@ -1,6 +1,4 @@
-﻿using DataAccessLayer.Entities;
-using DataAccessLayer.Mapping;
-using Domain.Enums;
+﻿using Domain.Enums;
 using Domain.Interfaces.Repositories;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
@@ -10,64 +8,69 @@ namespace DataAccessLayer.Repositories
 	internal class CategoryRepository : ICategoryRepository
 	{
 		private readonly PcShopDbContext _dbContext;
-		private readonly CategoryMapper _categoryMapper;
 
-		public CategoryRepository(PcShopDbContext dbContext, CategoryMapper categoryMapper)
+		public CategoryRepository(PcShopDbContext dbContext)
 		{
 			_dbContext = dbContext;
-			_categoryMapper = categoryMapper;
 		}
 
 		public async Task<List<Category>> GetAllAsync()
 		{
-			List<CategoryEntity> categoties = await _dbContext.Categories
+			List<Category> categoties = await _dbContext.Categories
+				.AsNoTracking()
 				.Include(c => c.CharacteristicPatterns)
 				.ToListAsync();
 
 			if(categoties.Count == 0)
 				return new List<Category>();
 
-			List<Category> mappedCategories = _categoryMapper.EntitiesToModels(categoties);
-			
-			System.Console.WriteLine(mappedCategories[0].CharacteristicPatterns.Count);
-			
-			return mappedCategories;
+			return categoties;
 		}
 
-		public async Task<(Category category, ErrorCodes errorCode)> GetByIdAsync(Guid id) // (Category, ErrorCode)
+		public async Task<(Category category, ErrorCodes errorCode)> GetByIdAsync(Guid id)
 		{
-			CategoryEntity categoryEntity = await _dbContext.Categories
-				.Include(c => c.CharacteristicPatterns)
+			Category categoryEntity = await _dbContext.Categories
+                .AsNoTracking()
+                .Include(c => c.CharacteristicPatterns)
 				.FirstOrDefaultAsync(c => c.Id == id);
 
 			if (categoryEntity == null)
 				return (null, ErrorCodes.CategoryNotFound);
 
-			Category mappedCategory =  _categoryMapper.EntityToModel(categoryEntity);
-
-			return (mappedCategory, ErrorCodes.None);
+			return (categoryEntity, ErrorCodes.None);
 		}
 
-		public async Task<List<Category>> GetByNameAsync(string name)
+		public async Task<(Category category, ErrorCodes errorCode)> GetByNameAsync(string name)
 		{
-			List<CategoryEntity> categoryEntities = await _dbContext.Categories
-				.Include(c => c.CharacteristicPatterns)
-				.Where(c => c.Name.Contains(name))
+			Category categoryEntity = await _dbContext.Categories
+				.Where(c => c.Name == name)
+                .AsNoTracking()
+                .Include(c => c.CharacteristicPatterns)
+				.FirstOrDefaultAsync();
+
+            if (categoryEntity == null)
+				return (null, ErrorCodes.CategoryNotFound);
+
+			return (categoryEntity, ErrorCodes.None);
+		}
+
+		public async Task<List<Category>> GetByNamesAsync(List<string> categoriesNames) 
+		{
+			List<Category> categoryEntities = await _dbContext.Categories
+				.Where(c => categoriesNames.Any(n => n == c.Name))
+				.AsNoTracking()
+                .Include(c => c.CharacteristicPatterns)
 				.ToListAsync();
 
-			if(categoryEntities.Count == 0)
+			if (categoryEntities.Count == 0)
 				return new List<Category>();
 
-			List<Category> mappedCategories = _categoryMapper.EntitiesToModels(categoryEntities);
-
-			return mappedCategories;
+			return categoryEntities;
 		}
 
 		public async Task<Category> CreateAsync(Category category)
 		{
-			CategoryEntity entity = _categoryMapper.ModelToEntity(category);
-
-			await _dbContext.AddAsync(entity);
+			await _dbContext.AddAsync(category);
 			await _dbContext.SaveChangesAsync();
 			
 			return category;

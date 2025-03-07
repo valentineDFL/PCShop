@@ -1,11 +1,12 @@
 {
   "Version": 1,
-  "Hash": "fjQ3W1JySVOkE5NcyFi38MKCl16xJOpULLPYVFKa8CE=",
+  "Hash": "xnLC+s+57Q7IcB3dbRIhxuHFVt4Z86rWJ6setyiUoVI=",
   "Source": "PCDetailsShop.API",
   "BasePath": "_content/PCDetailsShop.API",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
   "DiscoveryPatterns": [],
-  "Assets": []
+  "Assets": [],
+  "Endpoints": []
 }

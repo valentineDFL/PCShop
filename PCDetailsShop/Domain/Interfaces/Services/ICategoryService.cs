@@ -11,7 +11,7 @@ namespace Domain.Interfaces.Services
 
         public Task<BaseResult<Category>> GetByIdAsync(Guid categoryId);
 
-        public Task<CollectionResult<Category>> GetByNameAsync(string name);
+        public Task<BaseResult<Category>> GetByNameAsync(string name);
 
         public Task<BaseResult<Category>> CreateAsync(CreateCategoryDto dto);
 

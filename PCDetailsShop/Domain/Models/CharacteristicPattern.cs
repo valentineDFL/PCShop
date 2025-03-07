@@ -10,14 +10,24 @@ namespace Domain.Models
     {
         public CharacteristicPattern() { }
 
-        public CharacteristicPattern(Guid id, string name)
+        public CharacteristicPattern(Guid id, string name, Guid categoryId, Category category, 
+            List<CharacteristicRealization> realizations)
         {
             Id = id;
             Name = name;
+            CategoryId = categoryId;
+            Category = category;
+            Realizations = realizations;
         }
 
-        public Guid Id { get; }
+        public Guid Id { get; private set; }
 
-        public string Name { get; }
+        public string Name { get; private set; }
+
+        public Guid CategoryId { get; private set; }
+
+        public Category Category { get; private set; }
+
+        public List<CharacteristicRealization> Realizations { get; private set; }
     }
 }

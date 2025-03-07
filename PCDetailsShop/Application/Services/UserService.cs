@@ -5,6 +5,8 @@ using Domain.Interfaces.Repositories;
 using Domain.Enums;
 using Domain.Interfaces.Encrypt;
 using Domain.Models;
+using Domain.Dto.UserDto;
+using Domain.Interfaces.Auth;
 
 namespace Application.Services
 {
@@ -15,14 +17,20 @@ namespace Application.Services
 
         private readonly IEncrypter _passwordEncrypter;
 
-        public UserService(IUserRepository userRepository, ICartRepository cartRepository, IEncrypter passwordEncrypter)
+        private readonly IJwtProvider _jwtProvider;
+
+        public UserService(IUserRepository userRepository,
+                           ICartRepository cartRepository,
+                           IEncrypter passwordEncrypter,
+                           IJwtProvider jwtProvider)
         {
             _userRepository = userRepository;
             _cartRepository = cartRepository;
             _passwordEncrypter = passwordEncrypter;
+            _jwtProvider = jwtProvider;
         }
 
-        public async Task<BaseResult<User>> GetUserByIdAsync(Guid id)
+        public async Task<BaseResult<User>> GetByIdAsync(Guid id)
         {
             (User User, ErrorCodes errorCode) user = await _userRepository.GetByIdAsync(id);
 
@@ -38,7 +46,7 @@ namespace Application.Services
             return new BaseResult<User>() { Data = user.User };
         }
 
-        public async Task<BaseResult<User>> GetUserByNameAsync(string name)
+        public async Task<BaseResult<User>> GetByNameAsync(string name)
         {
             (User User, ErrorCodes errorCode) user = await _userRepository.GetByLoginAsync(name);
 
@@ -54,7 +62,7 @@ namespace Application.Services
             return new BaseResult<User>() { Data = user.User };
         }
 
-        public async Task<CollectionResult<User>> GetAllUsersAsync()
+        public async Task<CollectionResult<User>> GetAllAsync()
         {
             List<User> users = await _userRepository.GetAllAsync();
 
@@ -70,7 +78,7 @@ namespace Application.Services
             return new CollectionResult<User>() { Count = users.Count, Data = users };
         }
 
-        public async Task<BaseResult<User>> CreateUserAsync(CreateUserDto dto)
+        public async Task<BaseResult<User>> CreateAsync(CreateUserDto dto)
         {
             (User User, ErrorCodes errorCode) userWithTurnedLogin = await _userRepository.GetByLoginAsync(dto.Login);
             (User User, ErrorCodes errorCode) userWithTurnedEmail = await _userRepository.GetByEmailAsync(dto.Email);
@@ -112,7 +120,34 @@ namespace Application.Services
             return new BaseResult<User>() { Data = createdUser };
         }
 
-        public async Task<BaseResult<Guid>> DeleteUserByIdAsync(Guid id)
+        public async Task<BaseResult<string>> LoginAsync(LoginUserDto loginInfo)
+        {
+            var user = await _userRepository.GetByEmailAsync(loginInfo.Email);
+
+            if(user.ErrorCode != ErrorCodes.None)
+            {
+                return new BaseResult<string>()
+                {
+                    ErrorCode = (int)user.ErrorCode,
+                    ErrorMessage = user.ErrorCode.ToString()
+                };
+            }
+
+            if(user.User.Password != _passwordEncrypter.Encrypt(loginInfo.Password))
+            {
+                return new BaseResult<string>()
+                {
+                    ErrorCode = (int)ErrorCodes.UserPasswordDoesNotMatch,
+                    ErrorMessage = ErrorCodes.UserPasswordDoesNotMatch.ToString(),
+                };
+            }
+
+            var token = _jwtProvider.GenerateToken(user.User);
+
+            return new BaseResult<string>() { Data = token };            
+        }
+
+        public async Task<BaseResult<Guid>> DeleteByIdAsync(Guid id)
         {
             int deletedUser = await _userRepository.DeleteAsync(id);
 
@@ -128,7 +163,7 @@ namespace Application.Services
             return new BaseResult<Guid>() { Data = id };
         }
 
-        public async Task<BaseResult<string>> ChangeUserLoginAsync(Guid id, string newLogin)
+        public async Task<BaseResult<string>> ChangeLoginAsync(Guid id, string newLogin)
         {
             (User User, ErrorCodes errorCode) userWithTurnedNewLogin = await _userRepository.GetByLoginAsync(newLogin);
 
@@ -155,7 +190,7 @@ namespace Application.Services
             return new BaseResult<string>() { Data = newLogin };
         }
 
-        public async Task<BaseResult<string>> ChangeUserEmailAsync(Guid id, string newEmail)
+        public async Task<BaseResult<string>> ChangeEmailAsync(Guid id, string newEmail)
         {
             (User User, ErrorCodes errorCode) userWithTurnedNewEmail = await _userRepository.GetByEmailAsync(newEmail);
 
@@ -182,7 +217,7 @@ namespace Application.Services
             return new BaseResult<string>() { Data = newEmail };
         }
 
-        public async Task<BaseResult<string>> ChangeUserPasswordAsync(Guid id, string oldPassword, string newPassword)
+        public async Task<BaseResult<string>> ChangePasswordAsync(Guid id, string oldPassword, string newPassword)
         {
             (User User, ErrorCodes errorCode) user = await _userRepository.GetByIdAsync(id);
 

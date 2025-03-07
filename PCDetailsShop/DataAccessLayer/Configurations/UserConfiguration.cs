@@ -1,33 +1,48 @@
-﻿using DataAccessLayer.Entities;
+﻿using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DataAccessLayer.Configurations
 {
-    internal class UserConfiguration : IEntityTypeConfiguration<UserEntity>
+    internal class UserConfiguration : IEntityTypeConfiguration<User>
     {
-        public void Configure(EntityTypeBuilder<UserEntity> builder)
+        public void Configure(EntityTypeBuilder<User> builder)
         {
-            builder.HasKey(p => p.Id);
+            builder.HasKey(u => u.Id);
 
-            builder.HasAlternateKey(s => s.Login);
-            builder.Property(p => p.Login)
+            builder.HasAlternateKey(u => u.Login);
+            builder.Property(u => u.Login)
                 .HasMaxLength(32);
 
-            builder.HasAlternateKey(s => s.Email);
-            builder.Property(p => p.Email)
+            builder.HasAlternateKey(u => u.Email);
+            builder.Property(u => u.Email)
                 .HasMaxLength(32);
 
-            builder.Property(p => p.Password)
+            builder.Property(u => u.Password)
                 .IsRequired()
                 .HasMaxLength(64);
 
-            builder.Property(p => p.BirthDate)
+            builder.Property(u => u.BirthDate)
                 .IsRequired();
 
-            builder.HasOne(p => p.Cart)
-                .WithOne(p => p.User)
-                .HasForeignKey<CartEntity>(p => p.UserId);
+            builder.HasOne(u => u.Cart)
+                .WithOne(c => c.User)
+                .HasForeignKey<Cart>(p => p.UserId);
+
+            builder.HasMany(u => u.Roles)
+                .WithMany(r => r.Users);
+
+            User admin = GetAdmin();
+
+            builder.HasData(admin);
+        }
+
+        private User GetAdmin()
+        {
+            User admin = new User
+            {
+                
+            };
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Result
 {
-    public class CollectionResult<T> : BaseResult<IEnumerable<T>>
+    public class CollectionResult<T> : BaseResult<List<T>>
     {
         public long Count { get; set; }
     }

@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Domain.Dto;
-using Domain.Dto.ProductDtos;
-using Domain.Dto.CharacteristicPatternDto;
+using System;
 
-namespace Domain.Dto.CategoryDtos
+namespace Domain.Dto.CategoryDto
 {
-    public record CategoryDto(string Name, List<CharacteristicPatternDto.CharacteristicPatternDto> CharacteristicsPatterns);
+    public record CategoryDto(string Name);
 }

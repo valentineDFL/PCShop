@@ -1,12 +1,12 @@
-﻿using DataAccessLayer.Entities;
+﻿using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DataAccessLayer.Configurations
 {
-    internal class CategoryConfiguration : IEntityTypeConfiguration<CategoryEntity>
+    internal class CategoryConfiguration : IEntityTypeConfiguration<Category>
     {
-        public void Configure(EntityTypeBuilder<CategoryEntity> builder)
+        public void Configure(EntityTypeBuilder<Category> builder)
         {
             builder.HasKey(x => x.Id);
 
@@ -20,7 +20,8 @@ namespace DataAccessLayer.Configurations
                 .WithMany(p => p.Categories);
 
             builder.HasMany(c => c.CharacteristicPatterns)
-                .WithMany();
+                .WithOne(cp => cp.Category)
+                .HasForeignKey(cp => cp.CategoryId);
         }
     }
 }

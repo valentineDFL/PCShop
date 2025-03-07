@@ -8,39 +8,39 @@ namespace Domain.Models
 {
     public class Product
     {
-        public Product(Guid id, string name, string description, decimal price,
-            float weight, IReadOnlyList<Category> categories, 
-            List<CharacteristicRealization> characteristicsRealization, bool stockAvaiblity, int amount)
+        public Product() { }
+
+        public Product(Guid id, string name, string description, decimal price, float weight, bool stockAvailability, int count, 
+            List<Category> categories, List<CharacteristicRealization> characteristicsRealizations)
         {
             Id = id;
             Name = name;
             Description = description;
             Price = price;
             Weight = weight;
+            StockAvailability = stockAvailability;
+            Count = count;
             Categories = categories;
-            CharacteristicsRelizations = characteristicsRealization;
-            StockAvailability = stockAvaiblity;
-            Count = amount;
+            CharacteristicsRealizations = characteristicsRealizations;
         }
 
-        public Guid Id { get; }
+        public Guid Id { get; private set; }
 
-        public string Name { get; }
+        public string Name { get; private set; }
 
-        public string Description { get; }
+        public string Description { get; private set; }
 
-        public decimal Price { get; }
+        public decimal Price { get; private set; }
 
-        public float Weight { get; }
+        public float Weight { get; private set; }
 
-        public bool StockAvailability { get; }
+        public bool StockAvailability { get; private set; }
 
-        public int Count { get; }
-
+        public int Count { get; private set; }
 
         // Навигационное свойство
-        public IReadOnlyList<Category> Categories { get; }
+        public List<Category> Categories { get; private set; }
 
-        public IReadOnlyList<CharacteristicRealization> CharacteristicsRelizations { get; }  
+        public List<CharacteristicRealization> CharacteristicsRealizations { get; private set; }
     }
 }

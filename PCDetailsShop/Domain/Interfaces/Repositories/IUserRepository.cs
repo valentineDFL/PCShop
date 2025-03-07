@@ -19,6 +19,8 @@ namespace Domain.Interfaces.Repositories
 
         public Task<(User User, ErrorCodes ErrorCode)> GetByEmailAsync(string email);
 
+        public Task<List<Domain.Enums.Permissions>> GetPermissionsAsync(Guid userId);
+
         public Task<User> CreateAsync(User user);
 
         public Task<int> ChangeLoginAsync(Guid id, string newLogin);

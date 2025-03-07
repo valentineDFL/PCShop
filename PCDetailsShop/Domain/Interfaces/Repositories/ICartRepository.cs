@@ -9,6 +9,10 @@ namespace Domain.Interfaces.Repositories
 
         public Task<Cart> CreateAsync(Cart cart);
 
-        public Task<int> UpdateCartByIdAsync(Guid cartId, Cart newCartData);
+        public Task<(Product product, ErrorCodes errorCode)> AddProductAsync(Guid cartId, Guid productId);
+
+        public Task<(Guid productId, ErrorCodes errorCode)> RemoveProductAsync(Guid cartId, Guid productId);
+
+        public Task<(int removedProducts, ErrorCodes errorCode)> BuyProductsFromCartAsync(Guid cartId);
     }
 }

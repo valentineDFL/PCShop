@@ -1,8 +1,871 @@
 [
   {
+    "ContainingType": "PCDetailsShop.API.Controllers.AuthController",
+    "Method": "Login",
+    "RelativePath": "Auth/Login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loginInfo",
+        "Type": "Domain.Dto.UserDto.LoginUserDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.BaseResult\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.AuthController",
+    "Method": "Logout",
+    "RelativePath": "Auth/Logout",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.AuthController",
+    "Method": "Registration",
+    "RelativePath": "Auth/Registrate",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "Domain.Dto.UserDtos.CreateUserDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.BaseResult\u00601[[Domain.Dto.UserDtos.UserDto, Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.CartsController",
+    "Method": "GetProductFromCartByNameAsync",
+    "RelativePath": "Carts/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "productName",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.BaseResult\u00601[[Domain.Dto.ProductDtos.ProductDto, Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.CartsController",
+    "Method": "BuyProductsAsync",
+    "RelativePath": "Carts/{id}/buy-products",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.BaseResult\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.CartsController",
+    "Method": "GetProductsTotalPriceByIdAsync",
+    "RelativePath": "Carts/{id}/get-total-price",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.BaseResult\u00601[[System.Decimal, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.CartsController",
+    "Method": "GetProductsTotalWeightAsync",
+    "RelativePath": "Carts/{id}/get-total-weight",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.BaseResult\u00601[[System.Single, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.CartsController",
+    "Method": "GetAllProductsAsync",
+    "RelativePath": "Carts/cart-products/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.CollectionResult\u00601[[Domain.Dto.ProductDtos.ProductDto, Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.CartsController",
+    "Method": "RemoveProductFromCartByIdAsync",
+    "RelativePath": "Carts/remove-product-from-cart/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "productId",
+        "Type": "System.Guid",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.BaseResult\u00601[[Domain.Dto.ProductDtos.ProductDto, Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.CategoriesController",
+    "Method": "GetAllAsync",
+    "RelativePath": "Categories",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.CollectionResult\u00601[[Domain.Dto.CategoryDtos.CategoryResponseDto, Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.CategoriesController",
+    "Method": "CreateAsync",
+    "RelativePath": "Categories",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "createCategoryDto",
+        "Type": "Domain.Dto.CategoryDtos.CreateCategoryDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.BaseResult\u00601[[Domain.Dto.CategoryDtos.CategoryResponseDto, Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.CategoriesController",
+    "Method": "GetByIdAsync",
+    "RelativePath": "Categories/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Dto.CategoryDtos.CategoryResponseDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.CategoriesController",
+    "Method": "DeleteAsync",
+    "RelativePath": "Categories/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.BaseResult\u00601[[System.Guid, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.CategoriesController",
+    "Method": "ChangeCharacteristicPatternName",
+    "RelativePath": "Categories/{id}/change-characteristicPatternName",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "oldName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "newName",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.BaseResult\u00601[[Domain.Dto.CharacteristicPatternDto.CharacteristicPatternDto, Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.CategoriesController",
+    "Method": "ChangeNameAsync",
+    "RelativePath": "Categories/{id}/changeName",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "newName",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.BaseResult\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.CategoriesController",
+    "Method": "GetByNameAsync",
+    "RelativePath": "Categories/Categories/{name}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "name",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.BaseResult\u00601[[Domain.Dto.CategoryDtos.CategoryResponseDto, Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.CategoriesController",
+    "Method": "GetCategoryCharacteristicsByIdAsync",
+    "RelativePath": "Categories/characteristicPatterns/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.CollectionResult\u00601[[Domain.Dto.CharacteristicPatternDto.CharacteristicPatternDto, Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.ProductsController",
+    "Method": "GetAllAsync",
+    "RelativePath": "products",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.CollectionResult\u00601[[Domain.Dto.ProductDtos.ProductDto, Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.ProductsController",
+    "Method": "CreateAsync",
+    "RelativePath": "products",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "createDto",
+        "Type": "Domain.Dto.ProductDtos.CreateProductDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.BaseResult\u00601[[Domain.Dto.ProductDtos.ProductDto, Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.ProductsController",
+    "Method": "DeleteCategoryFromProductByNameAsync",
+    "RelativePath": "products/{categoryName}/delete-category-from-product",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "productId",
+        "Type": "System.Guid",
+        "IsRequired": false
+      },
+      {
+        "Name": "categoryName",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.BaseResult\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.ProductsController",
+    "Method": "GetByIdAsync",
+    "RelativePath": "products/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.BaseResult\u00601[[Domain.Dto.ProductDtos.ProductDto, Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.ProductsController",
+    "Method": "DeleteByIdAsync",
+    "RelativePath": "products/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.BaseResult\u00601[[System.Guid, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.ProductsController",
+    "Method": "GetByNamePartAsync",
+    "RelativePath": "products/{namePart}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "namePart",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.CollectionResult\u00601[[Domain.Dto.ProductDtos.ProductDto, Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.ProductsController",
+    "Method": "AddCategoryToProductByNameAsync",
+    "RelativePath": "products/{productId}/add-category-to-product",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "productId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "categoryName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "categoryCharacteristicRealizations",
+        "Type": "System.Collections.Generic.List\u00601[[Domain.Dto.CharacteristicRealizationCreateDto, Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.BaseResult\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.ProductsController",
+    "Method": "AddProductToCartAsync",
+    "RelativePath": "products/{productId}/add-product-to-cart",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "productId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "cartId",
+        "Type": "System.Guid",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.BaseResult\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.ProductsController",
+    "Method": "ChangeCharacteristicValueAsync",
+    "RelativePath": "products/{productId}/change-characteristicValue",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "productId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "characteristicName",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "newCharacteristicValue",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.BaseResult\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.ProductsController",
+    "Method": "ChangeDescriptionByIdAsync",
+    "RelativePath": "products/{productId}/change-description",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "productId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "newDescription",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.BaseResult\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.ProductsController",
+    "Method": "ChangeNameByIdAsync",
+    "RelativePath": "products/{productId}/change-name",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "productId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "newName",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.BaseResult\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.ProductsController",
+    "Method": "ChangePriceByIdAsync",
+    "RelativePath": "products/{productId}/change-price",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "productId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "newPrice",
+        "Type": "System.Decimal",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.BaseResult\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.ProductsController",
+    "Method": "ChangeWeightByIdAsync",
+    "RelativePath": "products/{productId}/change-weight",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "productId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "newWeight",
+        "Type": "System.Single",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.BaseResult\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PCDetailsShop.API.Controllers.ProductsController",
+    "Method": "GetByCategoriesNamesAsync",
+    "RelativePath": "products/categories",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "categories",
+        "Type": "System.String[]",
+        "IsRequired": false
+      },
+      {
+        "Name": "countPerPage",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "Domain.Result.CollectionResult\u00601[[Domain.Models.Product, Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
     "ContainingType": "PCDetailsShop.API.Controllers.UsersController",
     "Method": "GetAllUsersAsync",
-    "RelativePath": "users",
+    "RelativePath": "Users",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -22,7 +885,7 @@
   {
     "ContainingType": "PCDetailsShop.API.Controllers.UsersController",
     "Method": "DeleteUserByIdAsync",
-    "RelativePath": "users/{id}",
+    "RelativePath": "Users/{id}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -35,7 +898,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "Domain.Result.BaseResult\u00601[[Domain.Dto.UserDtos.UserDto, Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "Domain.Result.BaseResult\u00601[[System.Guid, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -48,7 +911,7 @@
   {
     "ContainingType": "PCDetailsShop.API.Controllers.UsersController",
     "Method": "GetUserById",
-    "RelativePath": "users/{id}",
+    "RelativePath": "Users/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -74,7 +937,7 @@
   {
     "ContainingType": "PCDetailsShop.API.Controllers.UsersController",
     "Method": "IncreaseWalletBalance",
-    "RelativePath": "users/{id}/balance/sum",
+    "RelativePath": "Users/{id}/balance/sum",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -105,7 +968,7 @@
   {
     "ContainingType": "PCDetailsShop.API.Controllers.UsersController",
     "Method": "ChangeUserEmailByIdAsync",
-    "RelativePath": "users/{id}/change-email",
+    "RelativePath": "Users/{id}/change-email",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -136,7 +999,7 @@
   {
     "ContainingType": "PCDetailsShop.API.Controllers.UsersController",
     "Method": "ChangeUserLoginByIdAsync",
-    "RelativePath": "users/{id}/change-login",
+    "RelativePath": "Users/{id}/change-login",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -167,7 +1030,7 @@
   {
     "ContainingType": "PCDetailsShop.API.Controllers.UsersController",
     "Method": "ChangeUserPasswordByIdAsync",
-    "RelativePath": "users/{id}/change-password",
+    "RelativePath": "Users/{id}/change-password",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -203,7 +1066,7 @@
   {
     "ContainingType": "PCDetailsShop.API.Controllers.UsersController",
     "Method": "GetUserByNameAsync",
-    "RelativePath": "users/{name}",
+    "RelativePath": "Users/{name}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -217,32 +1080,6 @@
     "ReturnTypes": [
       {
         "Type": "Domain.Result.CollectionResult\u00601[[Domain.Dto.UserDtos.UserDto, Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "PCDetailsShop.API.Controllers.UsersController",
-    "Method": "CreateUserAsync",
-    "RelativePath": "users/create",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "dto",
-        "Type": "Domain.Dto.UserDtos.CreateUserDto",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "Domain.Result.BaseResult\u00601[[Domain.Dto.UserDtos.UserDto, Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",

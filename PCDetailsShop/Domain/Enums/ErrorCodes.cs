@@ -8,49 +8,53 @@ namespace Domain.Enums
 {
     public enum ErrorCodes
     {
-        InternalServerError = 0,
-        None = 1,
+        None = 0,
+        InternalServerError = 1,
 
 
         UserNotFound = 11,
         UsersNotFound = 12,
+        UserPasswordDoesNotMatch = 13,
 
-        UserAlreadyExists = 13,
-        UserWithTurnedLoginAlreadyExists = 14,
-        UserWithTurnedEmailAlreadyExists = 15,
-        UserWithTurnerdEmailAndLoginAlreadyExists = 16,
+        InsufficientFunds = 14,
 
-        NewUserPasswordCannotBeRepeatedWithTheOldOne = 17,
+        UserAlreadyExists = 15,
+        UserWithTurnedLoginAlreadyExists = 16,
+        UserWithTurnedEmailAlreadyExists = 17,
+        UserWithTurnerdEmailAndLoginAlreadyExists = 18,
 
-        TheOldLoginDoesNotMatchTheLogin = 18,
-        TheOldEmailDoesNotMatchThePassword = 19,
-        TheOldPasswordDoesNotMatchThePassword = 20,
+        NewUserPasswordCannotBeRepeatedWithTheOldOne = 19,
 
-        TheAmountToBeCreditedMustBeGreaterThanZero = 21,
+        TheOldLoginDoesNotMatchTheLogin = 20,
+        TheOldEmailDoesNotMatchThePassword = 21,
+        TheOldPasswordDoesNotMatchThePassword = 22,
 
-        TheAmountToBeCreditedMustBeANumber = 22,
+        TheAmountToBeCreditedMustBeGreaterThanZero = 23,
 
-        NotEnoughFundsInTheUsersBalance = 23,
+        TheAmountToBeCreditedMustBeANumber = 24,
+
+        NotEnoughFundsInTheUsersBalance = 25,
 
 
         CartNotFound = 31,
         CartsNotFound = 32,
         CartDoesNotContainSelectedProduct = 33,
 
-
         ProductNotFound = 41,
         ProductsNotFound = 42,
         ProductAlreadyExists = 43,
 
+        ProductPriceMustBeGreaterThanZero = 44,
 
+        ProductWeightMustBeGreaterThanZero = 45,
+        ProductContainTurnedCategory = 46,
+        ProductDontContainTurnedCategory = 47,
+
+        NewProductCountMustBeGraaterThanZero = 47,
 
         CategoryNotFound = 51,
         CategoriesNotFound = 52,
         CategoryWithTurnedNameAlreadyExists = 53,
-
-        TheCategoryShouldNotContainRepetitiveProducts = 54,
-
-        ThereIsNoSuchProductInTheCategory = 55,
 
 
         CharacteristicNotFound = 61,
@@ -58,7 +62,14 @@ namespace Domain.Enums
 
         CharacteristicWithTurnedNameAlreadyExists = 63,
 
-        CategoryDoesNotContainSelectedCharacteristic = 63,
+        CharacteristicRealizationNotFound = 64,
+        
+        CharacteristicRealizationsNotFound = 65,
 
+        TheNumberOfImplementationsDoesNotMatchTheNumberOfTemplates = 71,
+        
+        TheNumberOfRealizationsOfTheCategoryPatternsDoesNotCorrespondToTheRequiredNumberOfPatterns = 72,
+
+        CategoryDoesNotContainSelectedCharacteristic = 73,
     }
 }
